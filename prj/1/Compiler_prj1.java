@@ -68,14 +68,21 @@ public class Compiler_prj1 {
     
       
       
-      
-      
     Scanner input = new Scanner(System.in);
     String line;
+      
     int state = 0;
     int lineNum = 0;
     int indexNum = 0;
+    int indexTrack = 0;
     int tokenNum = 0;
+    int currentCol = 1000;
+    boolean validToken = false;
+    
+    String tokType = " ";
+    int tokLine = 0;
+    int tokIndex = 0;
+    String tokName = "placehold";
     ArrayList<Token> list = new ArrayList<Token>();
     
     //Simple testing of Making a token sequence and printing it
@@ -83,21 +90,59 @@ public class Compiler_prj1 {
     while(input.hasNext()){
       line = input.nextLine();
       lineNum = lineNum + 1;
+      
       for(int i = 0; i != line.length(); i++){
         indexNum = indexNum + 1;
+        char next = line.charAt(i);
+          
+        //Insert any symbol check here, using $ just as a test
+        if(next == '$'){
+          if(validToken){
+              list.add(new Token(tokType, tokLine, tokIndex));
+              System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+              tokenNum = tokenNum + 1;
+              state = 0;
+              i = tokIndex-1;
+              indexNum = i+1;
+              tokIndex = 0;
+              tokLine = 0;
+              tokType = " ";
+              validToken = false;
+          }
         
-        //INSERT MORE EFFICIENT CHECKING CODE HERE!!!!
-        
-        if(line.charAt(i) == '('){
-          list.add(new Token("L_Paren", lineNum, indexNum));
-          System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-          tokenNum = tokenNum + 1;
+          else{
+            System.out.println("$ detected, end of program reached on line " + lineNum + " index " +indexNum);
+            state = 0;
+          }
         }
         
-        //REPLACE CHECKING CODE ABOVE!!!!
-          
+        else{
+          for(int j = 0; j < grammar.length; j++){
+            if(next == grammar[j]){
+              currentCol = j;
+            }
+          }
+        
+          if(currentCol == 1000){
+            System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ " index "+indexNum);
+          }
+            
+          else{
+            state = transition[state][currentCol];
+            //Insert full accept check here, using only int just as a test
+            if(state == 20){
+              validToken = true;
+              tokLine = lineNum;
+              tokIndex = indexNum;
+              tokType = "Int";
+            }
+          }
+            
+          currentCol = 1000;
+        } 
       }
       indexNum = 0;
     }
+      
   }
 }
