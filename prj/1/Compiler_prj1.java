@@ -82,10 +82,10 @@ public class Compiler_prj1 {
     String tokType = " ";
     int tokLine = 0;
     int tokIndex = 0;
+    String tokInput = " ";
     String tokName = "placehold";
     ArrayList<Token> list = new ArrayList<Token>();
     
-    //Simple testing of Making a token sequence and printing it
     
     while(input.hasNext()){
       line = input.nextLine();
@@ -100,10 +100,13 @@ public class Compiler_prj1 {
           if(validToken){
               list.add(new Token(tokType, tokLine, tokIndex));
               System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+              
               tokenNum = tokenNum + 1;
               state = 0;
+              indexNum = tokIndex;
               i = tokIndex-1;
-              indexNum = i+1;
+              
+              line = tokInput;
               tokIndex = 0;
               tokLine = 0;
               tokType = " ";
@@ -111,7 +114,7 @@ public class Compiler_prj1 {
           }
         
           else{
-            System.out.println("$ detected, end of program reached on line " + lineNum + " index " +indexNum);
+            System.out.println("$ DISCOVERED AT LINE " + lineNum + ", INDEX " +indexNum);
             state = 0;
           }
         }
@@ -135,11 +138,31 @@ public class Compiler_prj1 {
               tokLine = lineNum;
               tokIndex = indexNum;
               tokType = "Int";
+              tokInput = line;
             }
           }
             
           currentCol = 1000;
-        } 
+        }
+        
+        if(i == line.length() -1){
+          if(validToken){
+            list.add(new Token(tokType, tokLine, tokIndex));
+            System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+              
+            tokenNum = tokenNum + 1;
+            state = 0;
+            indexNum = tokIndex;
+            i = tokIndex-1;
+              
+            line = tokInput;
+            tokIndex = 0;
+            tokLine = 0;
+            tokType = " ";
+            validToken = false;
+        }
+        state = 0;
+      }
       }
       indexNum = 0;
     }
