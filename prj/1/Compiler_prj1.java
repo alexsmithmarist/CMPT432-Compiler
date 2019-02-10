@@ -6,13 +6,15 @@ public class Compiler_prj1 {
   
   public static void main(String[] args) {
     
+    // The list of valid symobls in the grammar. Ordered to be in line with
+    // - the columns of the transition table.
     char[] grammar = new char[] 
     {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
      'p','q','r','s','t','u','v','w','x','y','z','0','1','2','3',
      '4','5','6','7','8','9','{','}','(',')','=','"','!','+'};
     
-    //49 = error
-      
+    //49 = error. Valid states are indicated by comments and below when
+    // - checked 
     int[][] transition = new int[][]{
     {44,28,44,44,44,35,44,44,17,44,44,44,44,44,44,3,44,44,22,40,44,44,12,44,44,44,45,45,45,45,45,45,45,45,45,45,1,2,8,9,10,21,47,46},      //start
     {49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49}, //L_Brace
@@ -66,122 +68,148 @@ public class Compiler_prj1 {
     {49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49},  //invalid
     };
     
-      
-      
+    //Variables used to detect input
     Scanner input = new Scanner(System.in);
     String line;
    
-    int state = 0;
-    boolean eop = false;
+    //Variables used for position tracking
     int lineNum = 0;
     int indexNum = 0;
-    int indexTrack = 0;
     int tokenNum = 0;
-    int currentCol = 1000;
+    
+    //Variable used for various condition checks
+    boolean eop = false;
     boolean validToken = false;
     boolean isString = false;
     boolean isComment = false;
     
-    String tokType = " ";
+    //Variables for token detection and token creation
+    int state = 0;
+    int currentCol = 1000;
     int tokLine = 0;
     int tokIndex = 0;
-    //String tokInput = " ";
+    String tokType = " ";
     String tokName = "placehold";
     ArrayList<Token> list = new ArrayList<Token>();
     
-    
+    //The Lexer will continue as long as input is detected within a program
+    // - Max of one program per line, any more will be ignored.
     while(input.hasNext()){
+      
+      //Update line specific information and get the next line of input
       line = input.nextLine();
       lineNum = lineNum + 1;
       eop = false;
       
+      //Code used for each character of input
       for(int i = 0; i != line.length(); i++){
         if(eop == false){
           indexNum = indexNum + 1;
           char next = line.charAt(i);
-            
-          /*System.out.print(state);
-          System.out.print(i);
-          System.out.print(indexNum);
-          System.out.println();*/
           
-          if(isComment){
-              
+          //If the character is contained in a comment, it will be completely ignored
+          // - unless the character will end the comment.
+          if(isComment){ 
             if(next == '*'){
               if(line.charAt(i+1) == '/'){
                 isComment = false;
                 indexNum++;
                 i = i+1;
-                state = 0;
               }
             }    
           }
-            
-          else{
-          //NOT INDENTED YET    
-          // NOT INDENTED YET, JUST WANT TO SEE IF THIS WORKS
-              
-          if(isString && next != '"'){
-            list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
-            System.out.println(list.get(tokenNum).type + " WITH NAME "+String.valueOf(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-            tokenNum = tokenNum + 1;
-            state = 0;
-          }
           
+          //If the character is not in a comment.
+          else{  
             
-          //INDENT THIS CODE PROPERLY !!!! !!!! CURRENTLY NOT INDENTED PROPERLY!!!!
-             //INDENT THIS CODE PROPERLY !!!! !!!! CURRENTLY NOT INDENTED PROPERLY!!!!
-             //INDENT THIS CODE PROPERLY !!!! !!!! CURRENTLY NOT INDENTED PROPERLY!!!!
-             //INDENT THIS CODE PROPERLY !!!! !!!! CURRENTLY NOT INDENTED PROPERLY!!!!
-             //INDENT THIS CODE PROPERLY !!!! !!!! CURRENTLY NOT INDENTED PROPERLY!!!!
-             //INDENT THIS CODE PROPERLY !!!! !!!! CURRENTLY NOT INDENTED PROPERLY!!!!
-            
-            
-          else{
-          //Insert any valid symbol check here
-          if(next == '$' || next == ' ' || next == '=' || next == '"' || next == '+' || next == '!'|| next == '\t' || next == '/' || next == '*'){
-            if(validToken){
-                if(tokName.equals("placehold")){
-                  list.add(new Token(tokType, tokLine, tokIndex));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+            //Every character in a string is a char token, except for in comments
+            if(isString && next != '"'){
+    
+              if(line.length()-1 > i && next == '/'){
+                if(line.charAt(i+1) == '*'){
+                  isComment = true;
+                  indexNum++;
+                  i = i+1;
+                  state = 0;
                 }
-                else{
-                  list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                  System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                }
-              
+              }
+              else{
+                list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
+                System.out.println(list.get(tokenNum).type + " WITH NAME "+String.valueOf(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
                 tokenNum = tokenNum + 1;
                 state = 0;
-                indexNum = tokIndex;
-                i = tokIndex-1;
-              
-                //line = tokInput;
-                tokIndex = 0;
-                tokLine = 0;
-                tokType = " ";
-                tokName = "placehold";
-                validToken = false;
+              }
             }
-            
-            else if(next == '='){
-              if(line.length()-1 > i){
-                if(line.charAt(i+1) == '='){
-                  list.add(new Token("equal", lineNum, indexNum+1));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+          
+            //Not a string or comment    
+            else{
+              
+              //List of valid symbols that acts as separators to create tokens
+              if(next == '$' || next == ' ' || next == '=' || next == '"' || next == '+' || next == '!'|| next == '\t' || next == '/' || next == '*'){
                 
+                //If there is a valid token detected
+                if(validToken){
+                  
+                  //If the token is an Id, it has to be constructed differently since
+                  // - the symbol must be recorded for future use
+                  if(tokName.equals("placehold")){
+                    list.add(new Token(tokType, tokLine, tokIndex));
+                    System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                  }
+                  else{
+                    list.add(new Token(tokType, tokLine, tokIndex, tokName));
+                    System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                  }
+              
+                  //Update the tracking information
                   tokenNum = tokenNum + 1;
                   state = 0;
-                  indexNum = indexNum+1;
-                  i = i+1;
-                
-                  //line = tokInput;
+                  indexNum = tokIndex;
+                  i = tokIndex-1;
+              
+                  //Reset the token information for the next valid token
                   tokIndex = 0;
                   tokLine = 0;
                   tokType = " ";
                   tokName = "placehold";
                   validToken = false;
                 }
+            
+                //Specific rules for = (to detect assignment vs equals)
+                else if(next == '='){
+                //This length check is used to avoid looking at characters that don't exist
+                if(line.length()-1 > i){
+                  if(line.charAt(i+1) == '='){
+                    list.add(new Token("equal", lineNum, indexNum+1));
+                    System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                
+                    tokenNum = tokenNum + 1;
+                    state = 0;
+                    indexNum = indexNum+1;
+                    i = i+1;
+            
+                    tokIndex = 0;
+                    tokLine = 0;
+                    tokType = " ";
+                    tokName = "placehold";
+                    validToken = false;
+                  }
                   
+                  else{
+                    list.add(new Token("assignment", lineNum, indexNum));
+                    System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                
+                    tokenNum = tokenNum + 1;
+                    state = 0;
+                
+                    tokIndex = 0;
+                    tokLine = 0;
+                    tokType = " ";
+                    tokName = "placehold";
+                    validToken = false;
+                  }
+                }
+                
                 else{
                   list.add(new Token("assignment", lineNum, indexNum));
                   System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
@@ -189,368 +217,335 @@ public class Compiler_prj1 {
                   tokenNum = tokenNum + 1;
                   state = 0;
                 
-                  //line = tokInput;
                   tokIndex = 0;
                   tokLine = 0;
                   tokType = " ";
                   tokName = "placehold";
                   validToken = false;
                 }
-              }
                 
-              else{
-                list.add(new Token("assignment", lineNum, indexNum));
+              }
+              
+                //Specific rules for quotation marks (Starting and ending strings)
+                else if(next == '"'){
+                list.add(new Token("quote", lineNum, indexNum));
                 System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                
-                tokenNum = tokenNum + 1;
-                state = 0;
-                
-                //line = tokInput;
-                tokIndex = 0;
-                tokLine = 0;
-                tokType = " ";
-                tokName = "placehold";
-                validToken = false;
-              }
-                
-            }
-              
-            else if(next == ' ' && isString == true){
-              list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
-              System.out.println(list.get(tokenNum).type + " WITH NAME "+String.valueOf(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-              tokenNum = tokenNum + 1;
-              state = 0;
-            }
-              
-            else if(next == '"'){
-              list.add(new Token("quote", lineNum, indexNum));
-              System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                
-              tokenNum = tokenNum+1;
-              state = 0;
-                
-              tokIndex = 0;
-              tokLine = 0;
-              tokType = " ";
-              tokName = "placehold";
-            
-              if(isString == false){
-                isString = true;
-              }
-              else{
-                isString = false;
-              }
-                
-            }
-            
-            else if(next == '/'){
-              if(line.length()-1 > i){
-                if(line.charAt(i+1) == '*'){
-                  isComment = true;
-                  indexNum++;
-                  i = i+1;
-                  state = 0;
-                }
-                else{
-                  System.out.println("Error: / DETECTED AT LINE" +lineNum +" INDEX "+indexNum +" WITHOUT *");
-                }
-              }
-              else{
-                System.out.println("Error: / DETECTED AT LINE" +lineNum +" INDEX "+indexNum +" WITHOUT *");
-              }
-            }
-            
-            else if(next == '+'){
-              list.add(new Token("Plus", lineNum, indexNum));
-              System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                
-              tokenNum = tokenNum+1;
-              state = 0;
-                
-              tokIndex = 0;
-              tokLine = 0;
-              tokType = " ";
-              tokName = "placehold";
-            }
-              
-            else if(next == '!'){
-              if(line.length()-1 > i){
-                if(line.charAt(i+1) == '='){
-                  list.add(new Token("not_equal", lineNum, indexNum));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                
-                  tokenNum = tokenNum + 1;
-                  state = 0;
-                  indexNum = indexNum+1;
-                  i = i+1;
-                
-                  //line = tokInput;
-                  tokIndex = 0;
-                  tokLine = 0;
-                  tokType = " ";
-                  tokName = "placehold";
-                  validToken = false;
-                }
-              
-                else{
-                  System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
-                }
-              }
-            
-              else{
-                System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
-              }
-            }
-              
-            else if(next == '*'){
-              System.out.println("* DETECTED AT LINE " +lineNum+" INDEX "+indexNum+" WHEN NOT ENDING A COMMENT");
-            }
-        
-            else if(next == '$'){
-              System.out.println("$ DISCOVERED AT LINE " + lineNum + ", INDEX " +indexNum);
-              eop = true;
-              state = 0;
-              
-              tokIndex = 0;
-              tokLine = 0;
-              tokType = " ";
-              tokName = "placehold";
-              validToken = false;
-              isString = false;
-            }
-          }
-        
-          else{
-            for(int j = 0; j < grammar.length; j++){
-              if(next == grammar[j]){
-                currentCol = j;
-              }
-            }
-        
-            if(currentCol == 1000){
-              if(validToken){
-                if(tokName.equals("placehold")){
-                  list.add(new Token(tokType, tokLine, tokIndex));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                }
-                else{
-                  list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                  System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                }
-              
-                //System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ " index "+indexNum);
-                  
-                tokenNum = tokenNum + 1;
-                state = 0;
-                indexNum = tokIndex;
-                i = tokIndex-1;
-              
-                //line = tokInput;
-                tokIndex = 0;
-                tokLine = 0;
-                tokType = " ";
-                tokName = "placehold";
-                validToken = false;
-              }
-              else{
-                System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ " index "+indexNum);
-              }
-            }
-            
-            else{
-               state = transition[state][currentCol];
-              
-               //Start of list of accepting states
-                
-               if(state == 20){ //int
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Int";
-                tokName = "placehold";
-                }
-              else if (state == 17){ //id for i
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "i";
-              }
-              else if (state == 18){ //if
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "If";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 1){ // {
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "L_Bracket";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 2){ // }
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "R_Bracket";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 3){ // id for p
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "p";
-              }
-              else if (state == 7){ //print
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "print";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 8){ // (
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "L_Paren";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 9){ // )
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "R_Paren";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 12){ // id for w
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "w";
-              }
-              else if (state == 16){ // while
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "While";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 22){ // id for s
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "s";
-              }
-              else if (state == 27){ // string
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "String";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 28){ // id for b
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "b";
-              }
-              else if (state == 34){ // boolean
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Boolean";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 35){ // id for f
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "f";
-              }
-              else if (state == 39){ // false
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "False";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 40){ // id for t
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = "t";
-              }
-              else if (state == 43){ // true
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "True";
-                //tokInput = line;
-                tokName = "placehold";
-              }
-              else if (state == 44){ // id for not keyword starters
-                validToken = true;
-                tokLine = lineNum;
-                tokIndex = indexNum;
-                tokType = "Id";
-                //tokInput = line;
-                tokName = String.valueOf(next);
-              }
-              else if (state == 45){ // digit
-                list.add(new Token("Digit", lineNum, indexNum, Character.getNumericValue(next)));
-                System.out.println(list.get(tokenNum).type + " WITH VALUE "+Character.getNumericValue(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
                 
                 tokenNum = tokenNum+1;
                 state = 0;
-                  
+                
                 tokIndex = 0;
                 tokLine = 0;
                 tokType = " ";
                 tokName = "placehold";
-                validToken = false;
+            
+                isString = !isString; 
               }
-            } 
             
-                currentCol = 1000;
-          }
-          }
-          }
+                //Specific rules for / (detecting comments)
+                else if(next == '/'){
+                  if(line.length()-1 > i){
+                    if(line.charAt(i+1) == '*'){
+                      isComment = true;
+                      indexNum++;
+                      i = i+1;
+                      state = 0;
+                    }
+                    else{
+                      System.out.println("Error: / DETECTED AT LINE" +lineNum +" INDEX "+indexNum +" WITHOUT *");
+                    }
+                  }
+                  else{
+                    System.out.println("Error: / DETECTED AT LINE" +lineNum +" INDEX "+indexNum +" WITHOUT *");
+                  }
+                }
             
+                //Specific rules for +
+                else if(next == '+'){
+                  list.add(new Token("Plus", lineNum, indexNum));
+                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                
+                  tokenNum = tokenNum+1;
+                  state = 0;
+                
+                  tokIndex = 0;
+                  tokLine = 0;
+                  tokType = " ";
+                  tokName = "placehold";
+                }
+              
+                //Specific rules for ! (detecting inequality)
+                else if(next == '!'){
+                  //This check is to make sure the program does not try to find characters
+                  // - that don't exist on the current line
+                  if(line.length()-1 > i){
+                    if(line.charAt(i+1) == '='){
+                      list.add(new Token("not_equal", lineNum, indexNum));
+                      System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                
+                      tokenNum = tokenNum + 1;
+                      state = 0;
+                      indexNum = indexNum+1;
+                      i = i+1;
+                
+                      tokIndex = 0;
+                      tokLine = 0;
+                      tokType = " ";
+                      tokName = "placehold";
+                      validToken = false;
+                    } 
+              
+                    else{
+                      System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
+                    }
+                  }
+            
+                  else{
+                    System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
+                  }
+                }
+              
+                //* should not be encountered here since it is only valid in a comment
+                else if(next == '*'){
+                  System.out.println("* DETECTED AT LINE " +lineNum+" INDEX "+indexNum+" WHEN NOT ENDING A COMMENT");
+                }
         
+                //$ ends the program, so text on the same line after it will not be detected
+                else if(next == '$'){
+                  System.out.println("$ DISCOVERED AT LINE " + lineNum + ", INDEX " +indexNum);
+                  eop = true;
+                  state = 0;
+               
+                  tokIndex = 0;
+                  tokLine = 0;
+                  tokType = " ";
+                  tokName = "placehold";
+                  validToken = false;
+                  isString = false;
+                }
+              }
+        
+              //Not separators, will not create tokens when detected
+              else{
+                //Check if the character is in the table of valid symbols
+                for(int j = 0; j < grammar.length; j++){
+                  if(next == grammar[j]){
+                    currentCol = j;
+                  }
+                }
+        
+                //If the next character was not found in the table, it will be this value
+                if(currentCol == 1000){
+                  //Tokens will be made at errors since they separate valid text
+                  if(validToken){
+                    if(tokName.equals("placehold")){
+                      list.add(new Token(tokType, tokLine, tokIndex));
+                      System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    }
+                    
+                    else{
+                      list.add(new Token(tokType, tokLine, tokIndex, tokName));
+                      System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    }
+                  
+                    tokenNum = tokenNum + 1;
+                    state = 0;
+                    indexNum = tokIndex;
+                    i = tokIndex-1;
+              
+                    tokIndex = 0;
+                    tokLine = 0;
+                    tokType = " ";
+                    tokName = "placehold";
+                    validToken = false;
+                  }
+                
+                  //After there are no more tokens to make, return the error.
+                  else{
+                    System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ " index "+indexNum);
+                  }
+                }
+            
+                //The symbol is valid in our grammar
+                else{
+                  state = transition[state][currentCol];
+              
+                  //Start of list of accepting states
+                
+                  if(state == 20){ //int
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Int";
+                    tokName = "placehold";
+                  }
+                  else if (state == 17){ //id for i
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "i";
+                  }
+                  else if (state == 18){ //if
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "If";
+                    tokName = "placehold";
+                  }
+                  else if (state == 1){ // {
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "L_Bracket";
+                    tokName = "placehold";
+                  }
+                  else if (state == 2){ // }
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "R_Bracket";
+                    tokName = "placehold";
+                  }
+                  else if (state == 3){ // id for p
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "p";
+                  }
+                  else if (state == 7){ //print
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "print";
+                    tokName = "placehold";
+                  }
+                  else if (state == 8){ // (
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "L_Paren";
+                    tokName = "placehold";
+                  }
+                  else if (state == 9){ // )
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "R_Paren";
+                    tokName = "placehold";
+                  }
+                  else if (state == 12){ // id for w
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "w";
+                  }
+                  else if (state == 16){ // while
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "While";
+                    tokName = "placehold";
+                  }
+                  else if (state == 22){ // id for s
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "s";
+                  }
+                  else if (state == 27){ // string
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "String";
+                    tokName = "placehold";
+                  }
+                  else if (state == 28){ // id for b
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "b";
+                  }
+                  else if (state == 34){ // boolean
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Boolean";
+                    tokName = "placehold";
+                  }
+                  else if (state == 35){ // id for f
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "f";
+                  }
+                  else if (state == 39){ // false
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "False";
+                    tokName = "placehold";
+                  }
+                  else if (state == 40){ // id for t
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = "t";
+                  }
+                  else if (state == 43){ // true
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "True";
+                    tokName = "placehold";
+                  }
+                  else if (state == 44){ // id for not keyword starters
+                    validToken = true;
+                    tokLine = lineNum;
+                    tokIndex = indexNum;
+                    tokType = "Id";
+                    tokName = String.valueOf(next);
+                  }
+                
+                  //Since digits are only single numbers in our grammar, we can create
+                  // - this token as soon as we detect it
+                  else if (state == 45){ // digit
+                    list.add(new Token("Digit", lineNum, indexNum, Character.getNumericValue(next)));
+                    System.out.println(list.get(tokenNum).type + " WITH VALUE "+Character.getNumericValue(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                
+                    tokenNum = tokenNum+1;
+                    state = 0;
+                  
+                    tokIndex = 0;
+                    tokLine = 0;
+                    tokType = " ";
+                    tokName = "placehold";
+                    validToken = false;
+                  }
+                } 
+
+                //Reset the column once states are detected  
+                currentCol = 1000;
+              }
+            }
+          }
+            
+          //Create tokens at the end of the line, since it is considered whitespace
           if(i == line.length() -1){
             if(validToken){
               if(tokName.equals("placehold")){
-                  list.add(new Token(tokType, tokLine, tokIndex));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                list.add(new Token(tokType, tokLine, tokIndex));
+                System.out.println(list.get(tokenNum).type + " DETECTED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
               }
               else{
                 list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DETECTED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
               }
               
               tokenNum = tokenNum + 1;
@@ -558,19 +553,19 @@ public class Compiler_prj1 {
               indexNum = tokIndex;
               i = tokIndex-1;
               
-              //line = tokInput;
               tokIndex = 0;
               tokLine = 0;
               tokType = " ";
               tokName = "placehold";
               validToken = false;
+            }
+            state = 0;
           }
-          state = 0;
-        }
         }
       }
-        indexNum = 0;
-    }
-      
+        
+      //At the end of each line, reset the index number
+      indexNum = 0;
+    } 
   }
 }
