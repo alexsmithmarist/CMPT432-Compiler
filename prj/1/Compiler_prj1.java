@@ -82,6 +82,7 @@ public class Compiler_prj1 {
     boolean validToken = false;
     boolean isString = false;
     boolean isComment = false;
+    boolean isLetter = false;
     
     //Variables for token detection and token creation
     int state = 0;
@@ -91,6 +92,7 @@ public class Compiler_prj1 {
     String tokType = " ";
     String tokName = "placehold";
     ArrayList<Token> list = new ArrayList<Token>();
+    char next = ' ';
     
     //The Lexer will continue as long as input is detected within a program
     // - Max of one program per line, any more will be ignored.
@@ -103,9 +105,9 @@ public class Compiler_prj1 {
       
       //Code used for each character of input
       for(int i = 0; i != line.length(); i++){
+        next = line.charAt(i);
         if(eop == false){
           indexNum = indexNum + 1;
-          char next = line.charAt(i);
           
           //If the character is contained in a comment, it will be completely ignored
           // - unless the character will end the comment.
@@ -122,10 +124,24 @@ public class Compiler_prj1 {
           //If the character is not in a comment.
           else{  
             
-            //Every character in a string is a char token, except for in comments
+            //Lowercase letters in a string are char tokens, except for in comments
             if(isString && next != '"'){
+              
+              //Only lowercase letters are char tokens in strings
+              for(int p = 0; p < 26; p++){
+                if(next == grammar[p]){
+                  isLetter = true;
+                }
+              }
+                
+              if(isLetter || next == ' '){
+                list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
+                System.out.println(list.get(tokenNum).type + " WITH NAME "+String.valueOf(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                tokenNum = tokenNum + 1;
+                state = 0;
+              }
     
-              if(line.length()-1 > i && next == '/'){
+              else if(line.length()-1 > i && next == '/'){
                 if(line.charAt(i+1) == '*'){
                   isComment = true;
                   indexNum++;
@@ -133,12 +149,25 @@ public class Compiler_prj1 {
                   state = 0;
                 }
               }
-              else{
-                list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
-                System.out.println(list.get(tokenNum).type + " WITH NAME "+String.valueOf(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
-                tokenNum = tokenNum + 1;
+                
+              else if(next == '$'){
+                System.out.println("$ DISCOVERED AT LINE " + lineNum + ", INDEX " +indexNum);
+                eop = true;
                 state = 0;
+               
+                tokIndex = 0;
+                tokLine = 0;
+                tokType = " ";
+                tokName = "placehold";
+                validToken = false;
+                isString = false;
               }
+                
+              else{
+                System.out.println("Error: Invalid Symbol " +next+ " detected at line " +lineNum+ " index " +indexNum);
+              }
+             
+              isLetter = false;
             }
           
             //Not a string or comment    
@@ -307,7 +336,13 @@ public class Compiler_prj1 {
               
                 //* should not be encountered here since it is only valid in a comment
                 else if(next == '*'){
-                  System.out.println("* DETECTED AT LINE " +lineNum+" INDEX "+indexNum+" WHEN NOT ENDING A COMMENT");
+                  if(line.charAt(i+1) == '/'){
+                    System.out.println("Error: End comment symbol detected before start comment symbol");
+                    i = i+1;
+                  }
+                  else{
+                    System.out.println("* DETECTED AT LINE " +lineNum+" INDEX "+indexNum+" WHEN NOT ENDING A COMMENT");
+                  }
                 }
         
                 //$ ends the program, so text on the same line after it will not be detected
@@ -563,9 +598,19 @@ public class Compiler_prj1 {
           }
         }
       }
-        
+      //Makes sure there are no unfinished strings
+      if(isString){
+        System.out.println("Error: Ending quote not detected by end of line.");
+      }
+    
       //At the end of each line, reset the index number
       indexNum = 0;
-    } 
+      isString = false;
+    }
+    
+    //Gives warning if there is no program ending symbol
+    if(next != '$'){
+      System.out.println("Warning:No program termination symbol for last program");
+    }
   }
 }
