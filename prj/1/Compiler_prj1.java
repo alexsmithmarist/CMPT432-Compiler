@@ -93,6 +93,7 @@ public class Compiler_prj1 {
     String tokName = "placehold";
     ArrayList<Token> list = new ArrayList<Token>();
     char next = ' ';
+    char commentNext = ' ';
     
     //The Lexer will continue as long as input is detected within a program
     // - Max of one program per line, any more will be ignored.
@@ -105,13 +106,16 @@ public class Compiler_prj1 {
       
       //Code used for each character of input
       for(int i = 0; i != line.length(); i++){
+        /*System.out.print(lineNum);
+        System.out.print(indexNum);
+        System.out.println();*/
         next = line.charAt(i);
         if(eop == false){
           indexNum = indexNum + 1;
           
           //If the character is contained in a comment, it will be completely ignored
           // - unless the character will end the comment.
-          if(isComment){ 
+          if(isComment){
             if(next == '*'){
               if(line.charAt(i+1) == '/'){
                 isComment = false;
@@ -274,7 +278,7 @@ public class Compiler_prj1 {
                 //Specific rules for / (detecting comments)
                 else if(next == '/'){
                   if(line.length()-1 > i){
-                    if(line.charAt(i+1) == '*'){
+                    if(line.charAt(i+1) == '*'){ 
                       isComment = true;
                       indexNum++;
                       i = i+1;
@@ -608,6 +612,9 @@ public class Compiler_prj1 {
       isString = false;
     }
     
+    if(isComment){
+      System.out.println("Warning: Comment not terminated.");
+    }
     //Gives warning if there is no program ending symbol
     if(next != '$'){
       System.out.println("Warning:No program termination symbol for last program");
