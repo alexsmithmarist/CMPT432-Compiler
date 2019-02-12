@@ -76,6 +76,8 @@ public class Compiler_prj1 {
     int lineNum = 0;
     int indexNum = 0;
     int tokenNum = 0;
+    int errorNum = 0;
+    int programNum = 0;
     
     //Variable used for various condition checks
     boolean eop = false;
@@ -106,9 +108,7 @@ public class Compiler_prj1 {
       
       //Code used for each character of input
       for(int i = 0; i != line.length(); i++){
-        /*System.out.print(lineNum);
-        System.out.print(indexNum);
-        System.out.println();*/
+
         next = line.charAt(i);
         if(eop == false){
           indexNum = indexNum + 1;
@@ -140,7 +140,7 @@ public class Compiler_prj1 {
                 
               if(isLetter || next == ' '){
                 list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
-                System.out.println(list.get(tokenNum).type + " WITH NAME "+String.valueOf(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                System.out.println(list.get(tokenNum).type + " with name "+String.valueOf(next)+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 tokenNum = tokenNum + 1;
                 state = 0;
               }
@@ -155,7 +155,7 @@ public class Compiler_prj1 {
               }
                 
               else if(next == '$'){
-                System.out.println("$ DISCOVERED AT LINE " + lineNum + ", INDEX " +indexNum);
+                System.out.println("$ detected at line " + lineNum + ", index " +indexNum);
                 eop = true;
                 state = 0;
                
@@ -168,7 +168,8 @@ public class Compiler_prj1 {
               }
                 
               else{
-                System.out.println("Error: Invalid Symbol " +next+ " detected at line " +lineNum+ " index " +indexNum);
+                System.out.println("Error: Invalid symbol " +next+ " detected at line " +lineNum+ " index " +indexNum);
+                errorNum++;
               }
              
               isLetter = false;
@@ -187,11 +188,11 @@ public class Compiler_prj1 {
                   // - the symbol must be recorded for future use
                   if(tokName.equals("placehold")){
                     list.add(new Token(tokType, tokLine, tokIndex));
-                    System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                   }
                   else{
                     list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                    System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    System.out.println(list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                   }
               
                   //Update the tracking information
@@ -214,7 +215,7 @@ public class Compiler_prj1 {
                 if(line.length()-1 > i){
                   if(line.charAt(i+1) == '='){
                     list.add(new Token("equal", lineNum, indexNum+1));
-                    System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                     tokenNum = tokenNum + 1;
                     state = 0;
@@ -230,7 +231,7 @@ public class Compiler_prj1 {
                   
                   else{
                     list.add(new Token("assignment", lineNum, indexNum));
-                    System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                     tokenNum = tokenNum + 1;
                     state = 0;
@@ -245,7 +246,7 @@ public class Compiler_prj1 {
                 
                 else{
                   list.add(new Token("assignment", lineNum, indexNum));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                  System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                   tokenNum = tokenNum + 1;
                   state = 0;
@@ -262,7 +263,7 @@ public class Compiler_prj1 {
                 //Specific rules for quotation marks (Starting and ending strings)
                 else if(next == '"'){
                 list.add(new Token("quote", lineNum, indexNum));
-                System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                 tokenNum = tokenNum+1;
                 state = 0;
@@ -285,18 +286,20 @@ public class Compiler_prj1 {
                       state = 0;
                     }
                     else{
-                      System.out.println("Error: / DETECTED AT LINE" +lineNum +" INDEX "+indexNum +" WITHOUT *");
+                      System.out.println("Error: / detected at line " +lineNum +" index "+indexNum +" without *");
+                      errorNum++;
                     }
                   }
                   else{
-                    System.out.println("Error: / DETECTED AT LINE" +lineNum +" INDEX "+indexNum +" WITHOUT *");
+                    System.out.println("Error: / detected at line " +lineNum +" index "+indexNum +" without *");
+                    errorNum++;
                   }
                 }
             
                 //Specific rules for +
                 else if(next == '+'){
                   list.add(new Token("Plus", lineNum, indexNum));
-                  System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                  System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                   tokenNum = tokenNum+1;
                   state = 0;
@@ -314,7 +317,7 @@ public class Compiler_prj1 {
                   if(line.length()-1 > i){
                     if(line.charAt(i+1) == '='){
                       list.add(new Token("not_equal", lineNum, indexNum));
-                      System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                      System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                       tokenNum = tokenNum + 1;
                       state = 0;
@@ -330,11 +333,13 @@ public class Compiler_prj1 {
               
                     else{
                       System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
+                      errorNum++;
                     }
                   }
             
                   else{
                     System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
+                    errorNum++;
                   }
                 }
               
@@ -342,16 +347,18 @@ public class Compiler_prj1 {
                 else if(next == '*'){
                   if(line.charAt(i+1) == '/'){
                     System.out.println("Error: End comment symbol detected before start comment symbol");
+                    errorNum++;
                     i = i+1;
                   }
                   else{
-                    System.out.println("* DETECTED AT LINE " +lineNum+" INDEX "+indexNum+" WHEN NOT ENDING A COMMENT");
+                    System.out.println("Error: * detected at line " +lineNum+", index "+indexNum+" when not ending a comment");
+                    errorNum++;
                   }
                 }
         
                 //$ ends the program, so text on the same line after it will not be detected
                 else if(next == '$'){
-                  System.out.println("$ DISCOVERED AT LINE " + lineNum + ", INDEX " +indexNum);
+                  System.out.println("$ detected at line " + lineNum + ", index " +indexNum);
                   eop = true;
                   state = 0;
                
@@ -379,12 +386,12 @@ public class Compiler_prj1 {
                   if(validToken){
                     if(tokName.equals("placehold")){
                       list.add(new Token(tokType, tokLine, tokIndex));
-                      System.out.println(list.get(tokenNum).type + " DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                      System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                     }
                     
                     else{
                       list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                      System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                      System.out.println(list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                     }
                   
                     tokenNum = tokenNum + 1;
@@ -401,7 +408,8 @@ public class Compiler_prj1 {
                 
                   //After there are no more tokens to make, return the error.
                   else{
-                    System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ " index "+indexNum);
+                    System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ ", index "+indexNum);
+                    errorNum++;
                   }
                 }
             
@@ -457,7 +465,7 @@ public class Compiler_prj1 {
                     validToken = true;
                     tokLine = lineNum;
                     tokIndex = indexNum;
-                    tokType = "print";
+                    tokType = "Print";
                     tokName = "placehold";
                   }
                   else if (state == 8){ // (
@@ -556,7 +564,7 @@ public class Compiler_prj1 {
                   // - this token as soon as we detect it
                   else if (state == 45){ // digit
                     list.add(new Token("Digit", lineNum, indexNum, Character.getNumericValue(next)));
-                    System.out.println(list.get(tokenNum).type + " WITH VALUE "+Character.getNumericValue(next)+" DISCOVERED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                    System.out.println(list.get(tokenNum).type + " with value "+Character.getNumericValue(next)+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                     tokenNum = tokenNum+1;
                     state = 0;
@@ -580,11 +588,11 @@ public class Compiler_prj1 {
             if(validToken){
               if(tokName.equals("placehold")){
                 list.add(new Token(tokType, tokLine, tokIndex));
-                System.out.println(list.get(tokenNum).type + " DETECTED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
               }
               else{
                 list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                System.out.println(list.get(tokenNum).type + " WITH NAME "+tokName+" DETECTED AT LINE " + list.get(tokenNum).lineNum + ", INDEX " +list.get(tokenNum).indexNum);
+                System.out.println(list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
               }
               
               tokenNum = tokenNum + 1;
@@ -605,19 +613,32 @@ public class Compiler_prj1 {
       //Makes sure there are no unfinished strings
       if(isString){
         System.out.println("Error: Ending quote not detected by end of line.");
+        errorNum++;
       }
     
       //At the end of each line, reset the index number
       indexNum = 0;
       isString = false;
+        
+      if(eop){
+        if(isString){
+          System.out.println("Error: Ending quote not detected by end of line.");
+          errorNum++;
+        }  
+        programNum++;
+        System.out.println(errorNum + " errors detected in program " +programNum);
+        System.out.println();
+        errorNum = 0;
+      }
+        
     }
     
     if(isComment){
-      System.out.println("Warning: Comment not terminated.");
+      System.out.println("Warning: No comment termination by end of file.");
     }
     //Gives warning if there is no program ending symbol
     if(next != '$'){
-      System.out.println("Warning:No program termination symbol for last program");
+      System.out.println("Warning: No program termination symbol for last program.");
     }
   }
 }
