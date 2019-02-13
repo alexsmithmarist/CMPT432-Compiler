@@ -626,7 +626,7 @@ public class Compiler_prj1 {
           errorNum++;
         }  
         programNum++;
-        System.out.println(errorNum + " errors detected in program " +programNum);
+        System.out.println(errorNum + " Lexer errors detected in program " +programNum);
         System.out.println();
         errorNum = 0;
       }
@@ -639,6 +639,8 @@ public class Compiler_prj1 {
     //Gives warning if there is no program ending symbol
     if(next != '$'){
       System.out.println("Warning: No program termination symbol for last program.");
+        
+    //Start parser here
     }
   }
 }
