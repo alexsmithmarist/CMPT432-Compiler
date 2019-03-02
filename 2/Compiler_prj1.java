@@ -626,6 +626,10 @@ public class Compiler_prj1 {
           Parser parse = new Parser(list, startTokenNum);
           parse.parseProgram();
           System.out.println(parse.parseError + " Errors detected while parsing " + programNum);
+            
+          if(parse.parseError == 0){
+            parse.printCST();
+          }
         }
           
         errorNum = 0;
