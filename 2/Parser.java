@@ -16,15 +16,18 @@ public class Parser{
   }
     
   boolean parseProgram(){
+    System.out.println("Program");
     tree.addBranch("program");
     boolean retVal = false;
     parseBlock();
     retVal = match("EOP");
+    System.out.println(" ");
       
     return retVal;
   }
     
   boolean parseBlock(){
+    System.out.println("Block");
     tree.addBranch("block");
       
     boolean retVal = false;
@@ -37,6 +40,7 @@ public class Parser{
   }
     
   boolean parseStateList(){
+    System.out.println("Statement List");
     tree.addBranch("statement list");
       
     boolean retVal = false;
@@ -55,6 +59,7 @@ public class Parser{
   }
     
   boolean parseState(){
+    System.out.println("Statement");
     tree.addBranch("statement");
       
     boolean retVal = false;
@@ -82,6 +87,7 @@ public class Parser{
   }
     
   boolean parsePrint(){
+    System.out.println("Print");
     tree.addBranch("print statement");
       
     boolean retVal = false;
@@ -95,6 +101,7 @@ public class Parser{
   }
     
   boolean parseAssign(){
+    System.out.println("Assignment");
     tree.addBranch("assignment statement");
       
     boolean retVal = false;
@@ -107,6 +114,7 @@ public class Parser{
   }
   
   boolean parseVar(){
+    System.out.println("VarDecl");
     tree.addBranch("varDecl");
       
     boolean retVal = false;
@@ -118,6 +126,7 @@ public class Parser{
   }
    
   boolean parseWhile(){
+    System.out.println("While");
     tree.addBranch("while statement");
       
     boolean retVal = false;
@@ -130,6 +139,7 @@ public class Parser{
   }
   
   boolean parseIf(){
+    System.out.println("If");
     tree.addBranch("if statement");
       
     boolean retVal = false;
@@ -142,6 +152,7 @@ public class Parser{
   }
     
   boolean parseExpr(){
+    System.out.println("Expression");
     tree.addBranch("Expr");
       
     boolean retVal = false;
@@ -163,6 +174,7 @@ public class Parser{
   }
     
   boolean parseIntExpr(){
+    System.out.println("Int Expression");
     tree.addBranch("Int Expr");
       
     boolean retVal = false;
@@ -177,6 +189,7 @@ public class Parser{
   }
     
   boolean parseStringExpr(){
+    System.out.println("String Expression");
     tree.addBranch("String Expr");
       
     boolean retVal = false;
@@ -189,6 +202,7 @@ public class Parser{
   }
     
   boolean parseBooleanExpr(){
+    System.out.println("Boolean Expression");
     tree.addBranch("Boolean Expr");
       
     boolean retVal = false;
@@ -208,6 +222,7 @@ public class Parser{
   }
     
   boolean parseId(){
+    System.out.println("Id");
     tree.addBranch("Id");
       
     boolean retVal = false;
@@ -218,24 +233,31 @@ public class Parser{
   }
     
   boolean parseCharList(){
+    System.out.println("Char List");
     tree.addBranch("char list");
       
     boolean retVal = false;
     if(stream.get(i).type.equals("char")){
         
       if(!stream.get(i).name.equals(" ")){
+        tree.addBranch("char");
+        tree.addBranch("char list");
+        
         retVal = match("char");
         retVal = parseCharList();
       }
-      else{
+      else if(stream.get(i).name.equals(" ")){
+        tree.addBranch("space");
+        tree.addBranch("char list");
+
         retVal = match("char");
-        /* INDICATE SPACE IN CST HERE */
         retVal = parseCharList();
       }
-    
     }
     else{
-     /*epsilon production*/
+        /*retVal = match("char");
+         INDICATE SPACE IN CST HERE 
+        retVal = parseCharList(); */
     }
       
     tree.endChildren();
@@ -243,6 +265,7 @@ public class Parser{
   }
     
   boolean parseType(){
+    System.out.println("Type");
     tree.addBranch("type");
     
     boolean retVal = false;
@@ -261,6 +284,7 @@ public class Parser{
   }
     
   boolean parseBoolop(){
+    System.out.println("Bool Op");
     tree.addBranch("bool op");
       
     boolean retVal = false;
@@ -276,6 +300,7 @@ public class Parser{
   }
     
   boolean parseBool(){
+    System.out.println("Bool");
     tree.addBranch("bool");
       
     boolean retVal = false;
@@ -292,17 +317,31 @@ public class Parser{
     
   boolean match(String expTok){
     boolean retVal = false;
-    if(stream.get(i).type.equals(expTok)){
-      tree.addLeaf(expTok);
-      retVal = true;
-      System.out.println(expTok);
+    if(parseError == 0){
+      if(stream.get(i).type.equals(expTok)){
+        if(expTok.equals("Id")){
+          tree.addLeaf(stream.get(i).name);
+        }
+        else if(expTok.equals("Digit")){
+          tree.addBranch(expTok);
+          tree.addLeaf(Integer.toString(stream.get(i).value));
+        }
+        else if(expTok.equals("char")){
+          tree.addLeaf(stream.get(i).name);
+        }
+        else{
+          tree.addLeaf(expTok);
+        }
+        retVal = true;
+      }
+      //System.out.println(expTok);
       /* CST STUFF GOES HERE */
-    }
       
-    if(retVal == false){
-      System.out.println("Parse Error: Found " + stream.get(i).type + " on line " + stream.get(i).lineNum + ", index " + stream.get(i).indexNum + " when expecting " + expTok);
+      if(retVal == false){
+        System.out.println("Parse Error: Found " + stream.get(i).type + " on line " + stream.get(i).lineNum + ", index " + stream.get(i).indexNum + " when expecting " + expTok);
         
-      parseError++;
+        parseError++;
+      }
     }
       
     i++;

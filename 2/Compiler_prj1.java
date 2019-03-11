@@ -106,7 +106,7 @@ public class Compiler_prj1 {
       line = input.nextLine();
       lineNum = lineNum + 1;
       eop = false;
-      startTokenNum = tokenNum;
+     
       //Code used for each character of input
       for(int i = 0; i != line.length(); i++){
 
@@ -633,6 +633,7 @@ public class Compiler_prj1 {
         }
           
         errorNum = 0;
+        startTokenNum = tokenNum;
       }
         
     }

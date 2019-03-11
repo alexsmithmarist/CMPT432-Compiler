@@ -59,13 +59,21 @@ class CST{
       traversalResult = traversalResult + "<" + node.name + ">";
       //traversalResult = traversalResult + "\n";
       System.out.println(traversalResult);
-      for (int j = 0; j < node.children.size(); j++){
-        printTree(node.children.get(j), depth+1);
+      if(node.name.equals("char") || node.name.equals("space")){
+        for (int j = 0; j < node.children.size(); j++){
+          printTree(node.children.get(j), depth);
+        }
+      }  
+          
+      else{
+        for (int j = 0; j < node.children.size(); j++){
+          printTree(node.children.get(j), depth+1);
+        }
       }
     }
       
     else{
-      traversalResult = traversalResult + "[" + node.name + "] \n";
+      traversalResult = traversalResult + "[" + node.name + "] ";
       System.out.println(traversalResult);
     }
     
