@@ -179,8 +179,10 @@ public class Parser{
     tree.addBranch("Int Expr");
       
     boolean retVal = false;
+    System.out.println("parse: Digit");
     retVal = match("Digit");
     if(stream.get(i).type.equals("Plus")){
+      System.out.println("parse: IntOp");
       retVal = match("Plus");
       retVal = parseExpr();
     }
@@ -346,9 +348,10 @@ public class Parser{
         
         parseError++;
       }
+      i++;
     }
       
-    i++;
+    //i++;
     return retVal;
   }
     

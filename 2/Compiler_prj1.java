@@ -3,8 +3,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 /* TO DO:
-   FIX INDENTATION ISSUE 
-   FIND OUT WHY ERRORS SOMETIMES CRASH PROGRAM
+   FIX INDENTATION ISSUE
 */
 
 public class Compiler_prj1 {
@@ -630,7 +629,9 @@ public class Compiler_prj1 {
         if(errorNum == 0){
           Parser parse = new Parser(list, startTokenNum);
           parse.parseProgram();
-          System.out.println("Parser Error detected in program " + programNum);
+          if(parse.parseError!=0){
+            System.out.println(parse.parseError +" Parser Errors detected in program " + programNum);
+          }
             
           if(parse.parseError == 0){
             parse.printCST();
