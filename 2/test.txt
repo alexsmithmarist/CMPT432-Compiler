@@ -1,0 +1,28 @@
+/*These are the test cases for the parser*/
+
+/*This tests parsing charlist and the parser properly identifying characters and spaces*/
+{
+print("alex")
+}$
+
+/*This tests parsing while loops inside while loops*/
+{
+int a
+a = 1
+while(a==a){
+  while(a!=0){
+    a = 1 + a
+  }
+}
+}$
+
+/*This will fail parsing*/
+{
+print(01)
+}$
+
+/*This tests the proper implementation of the epsilon production in statement list*/
+{
+if true {
+}}$
+

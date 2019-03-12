@@ -16,7 +16,7 @@ public class Parser{
   }
     
   boolean parseProgram(){
-    System.out.println("Program");
+    System.out.println("parse: Program");
     tree.addBranch("program");
     boolean retVal = false;
     parseBlock();
@@ -27,7 +27,7 @@ public class Parser{
   }
     
   boolean parseBlock(){
-    System.out.println("Block");
+    System.out.println("parse: Block");
     tree.addBranch("block");
       
     boolean retVal = false;
@@ -40,12 +40,13 @@ public class Parser{
   }
     
   boolean parseStateList(){
-    System.out.println("Statement List");
-    tree.addBranch("statement list");
+    System.out.println("parse: Statement List");
+    //tree.addBranch("statement list");
       
     boolean retVal = false;
     if(stream.get(i).type.equals("Print") || stream.get(i).type.equals("Id") || stream.get(i).type.equals("Int") || stream.get(i).type.equals("String") || stream.get(i).type.equals("Boolean") || stream.get(i).type.equals("While") || stream.get(i).type.equals("If") || stream.get(i).type.equals("L_Bracket")){
-      
+        
+      tree.addBranch("statement list");
       retVal = parseState();
       retVal = parseStateList();
     }
@@ -59,7 +60,7 @@ public class Parser{
   }
     
   boolean parseState(){
-    System.out.println("Statement");
+    System.out.println("parse: Statement");
     tree.addBranch("statement");
       
     boolean retVal = false;
@@ -87,7 +88,7 @@ public class Parser{
   }
     
   boolean parsePrint(){
-    System.out.println("Print");
+    System.out.println("parse: Print");
     tree.addBranch("print statement");
       
     boolean retVal = false;
@@ -101,7 +102,7 @@ public class Parser{
   }
     
   boolean parseAssign(){
-    System.out.println("Assignment");
+    System.out.println("parse: Assignment");
     tree.addBranch("assignment statement");
       
     boolean retVal = false;
@@ -114,7 +115,7 @@ public class Parser{
   }
   
   boolean parseVar(){
-    System.out.println("VarDecl");
+    System.out.println("parse: VarDecl");
     tree.addBranch("varDecl");
       
     boolean retVal = false;
@@ -126,7 +127,7 @@ public class Parser{
   }
    
   boolean parseWhile(){
-    System.out.println("While");
+    System.out.println("parse: While");
     tree.addBranch("while statement");
       
     boolean retVal = false;
@@ -139,7 +140,7 @@ public class Parser{
   }
   
   boolean parseIf(){
-    System.out.println("If");
+    System.out.println("parse: If");
     tree.addBranch("if statement");
       
     boolean retVal = false;
@@ -152,7 +153,7 @@ public class Parser{
   }
     
   boolean parseExpr(){
-    System.out.println("Expression");
+    System.out.println("parse: Expression");
     tree.addBranch("Expr");
       
     boolean retVal = false;
@@ -174,7 +175,7 @@ public class Parser{
   }
     
   boolean parseIntExpr(){
-    System.out.println("Int Expression");
+    System.out.println("parse: Int Expression");
     tree.addBranch("Int Expr");
       
     boolean retVal = false;
@@ -189,7 +190,7 @@ public class Parser{
   }
     
   boolean parseStringExpr(){
-    System.out.println("String Expression");
+    System.out.println("parse: String Expression");
     tree.addBranch("String Expr");
       
     boolean retVal = false;
@@ -202,7 +203,7 @@ public class Parser{
   }
     
   boolean parseBooleanExpr(){
-    System.out.println("Boolean Expression");
+    System.out.println("parse: Boolean Expression");
     tree.addBranch("Boolean Expr");
       
     boolean retVal = false;
@@ -222,7 +223,7 @@ public class Parser{
   }
     
   boolean parseId(){
-    System.out.println("Id");
+    System.out.println("parse: Id");
     tree.addBranch("Id");
       
     boolean retVal = false;
@@ -233,13 +234,15 @@ public class Parser{
   }
     
   boolean parseCharList(){
-    System.out.println("Char List");
-    tree.addBranch("char list");
+    System.out.println("parse: Char List");
+    //tree.addBranch("char list");
       
     boolean retVal = false;
     if(stream.get(i).type.equals("char")){
+      tree.addBranch("char list");
         
       if(!stream.get(i).name.equals(" ")){
+        System.out.println("parse: Char");
         tree.addBranch("char");
         tree.addBranch("char list");
         
@@ -247,6 +250,7 @@ public class Parser{
         retVal = parseCharList();
       }
       else if(stream.get(i).name.equals(" ")){
+        System.out.println("parse: Space");
         tree.addBranch("space");
         tree.addBranch("char list");
 
@@ -265,7 +269,7 @@ public class Parser{
   }
     
   boolean parseType(){
-    System.out.println("Type");
+    System.out.println("parse: Type");
     tree.addBranch("type");
     
     boolean retVal = false;
@@ -284,7 +288,7 @@ public class Parser{
   }
     
   boolean parseBoolop(){
-    System.out.println("Bool Op");
+    System.out.println("parse: Bool Op");
     tree.addBranch("bool op");
       
     boolean retVal = false;
@@ -300,7 +304,7 @@ public class Parser{
   }
     
   boolean parseBool(){
-    System.out.println("Bool");
+    System.out.println("parse: Bool");
     tree.addBranch("bool");
       
     boolean retVal = false;

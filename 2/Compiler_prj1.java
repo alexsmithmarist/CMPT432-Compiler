@@ -2,6 +2,11 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 
+/* TO DO:
+   FIX INDENTATION ISSUE 
+   FIND OUT WHY ERRORS SOMETIMES CRASH PROGRAM
+*/
+
 public class Compiler_prj1 {
   
   public static void main(String[] args) {
@@ -141,7 +146,7 @@ public class Compiler_prj1 {
                 
               if(isLetter || next == ' '){
                 list.add(new Token("char", lineNum, indexNum, String.valueOf(next)));
-                System.out.println(list.get(tokenNum).type + " with name "+String.valueOf(next)+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                System.out.println("Lex: " + list.get(tokenNum).type + " with name "+String.valueOf(next)+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 tokenNum = tokenNum + 1;
                 state = 0;
               }
@@ -156,7 +161,7 @@ public class Compiler_prj1 {
               }
                 
               else{
-                System.out.println("Error: Invalid symbol " +next+ " detected at line " +lineNum+ " index " +indexNum);
+                System.out.println("Lex Error: Invalid symbol " +next+ " detected at line " +lineNum+ " index " +indexNum);
                 errorNum++;
               }
              
@@ -176,11 +181,11 @@ public class Compiler_prj1 {
                   // - the symbol must be recorded for future use
                   if(tokName.equals("placehold")){
                     list.add(new Token(tokType, tokLine, tokIndex));
-                    System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                    System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                   }
                   else{
                     list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                    System.out.println(list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                    System.out.println("Lex: " +list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                   }
               
                   //Update the tracking information
@@ -203,7 +208,7 @@ public class Compiler_prj1 {
                 if(line.length()-1 > i){
                   if(line.charAt(i+1) == '='){
                     list.add(new Token("equal", lineNum, indexNum+1));
-                    System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                    System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                     tokenNum = tokenNum + 1;
                     state = 0;
@@ -219,7 +224,7 @@ public class Compiler_prj1 {
                   
                   else{
                     list.add(new Token("assignment", lineNum, indexNum));
-                    System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                    System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                     tokenNum = tokenNum + 1;
                     state = 0;
@@ -234,7 +239,7 @@ public class Compiler_prj1 {
                 
                 else{
                   list.add(new Token("assignment", lineNum, indexNum));
-                  System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                  System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                   tokenNum = tokenNum + 1;
                   state = 0;
@@ -251,7 +256,7 @@ public class Compiler_prj1 {
                 //Specific rules for quotation marks (Starting and ending strings)
                 else if(next == '"'){
                 list.add(new Token("quote", lineNum, indexNum));
-                System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                 tokenNum = tokenNum+1;
                 state = 0;
@@ -274,12 +279,12 @@ public class Compiler_prj1 {
                       state = 0;
                     }
                     else{
-                      System.out.println("Error: / detected at line " +lineNum +" index "+indexNum +" without *");
+                      System.out.println("Lex Error: / detected at line " +lineNum +" index "+indexNum +" without *");
                       errorNum++;
                     }
                   }
                   else{
-                    System.out.println("Error: / detected at line " +lineNum +" index "+indexNum +" without *");
+                    System.out.println("Lex Error: / detected at line " +lineNum +" index "+indexNum +" without *");
                     errorNum++;
                   }
                 }
@@ -287,7 +292,7 @@ public class Compiler_prj1 {
                 //Specific rules for +
                 else if(next == '+'){
                   list.add(new Token("Plus", lineNum, indexNum));
-                  System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                  System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                   tokenNum = tokenNum+1;
                   state = 0;
@@ -305,7 +310,7 @@ public class Compiler_prj1 {
                   if(line.length()-1 > i){
                     if(line.charAt(i+1) == '='){
                       list.add(new Token("not_equal", lineNum, indexNum));
-                      System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                      System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                       tokenNum = tokenNum + 1;
                       state = 0;
@@ -320,13 +325,13 @@ public class Compiler_prj1 {
                     } 
               
                     else{
-                      System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
+                      System.out.println("Lex Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
                       errorNum++;
                     }
                   }
             
                   else{
-                    System.out.println("Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
+                    System.out.println("Lex Error: Expected = after ! on line "+ lineNum+ ", index " +indexNum);
                     errorNum++;
                   }
                 }
@@ -334,12 +339,12 @@ public class Compiler_prj1 {
                 //* should not be encountered here since it is only valid in a comment
                 else if(next == '*'){
                   if(line.charAt(i+1) == '/'){
-                    System.out.println("Error: End comment symbol detected before start comment symbol");
+                    System.out.println("Lex Error: End comment symbol detected before start comment symbol");
                     errorNum++;
                     i = i+1;
                   }
                   else{
-                    System.out.println("Error: * detected at line " +lineNum+", index "+indexNum+" when not ending a comment");
+                    System.out.println("Lex Error: * detected at line " +lineNum+", index "+indexNum+" when not ending a comment");
                     errorNum++;
                   }
                 }
@@ -348,7 +353,7 @@ public class Compiler_prj1 {
                 else if(next == '$'){
                   list.add(new Token("EOP", lineNum, indexNum));
                   tokenNum = tokenNum+1;
-                  System.out.println("$ detected at line " + lineNum + ", index " +indexNum);
+                  System.out.println("Lex: $ detected at line " + lineNum + ", index " +indexNum);
                   eop = true;
                   state = 0;
                
@@ -376,12 +381,12 @@ public class Compiler_prj1 {
                   if(validToken){
                     if(tokName.equals("placehold")){
                       list.add(new Token(tokType, tokLine, tokIndex));
-                      System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                      System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                     }
                     
                     else{
                       list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                      System.out.println(list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                      System.out.println("Lex: " +list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                     }
                   
                     tokenNum = tokenNum + 1;
@@ -398,7 +403,7 @@ public class Compiler_prj1 {
                 
                   //After there are no more tokens to make, return the error.
                   else{
-                    System.out.println("Error: Invalid symbol " +next+" detected at line " +lineNum+ ", index "+indexNum);
+                    System.out.println("Lex Error: Invalid symbol " +next+" detected at line " +lineNum+ ", index "+indexNum);
                     errorNum++;
                   }
                 }
@@ -554,7 +559,7 @@ public class Compiler_prj1 {
                   // - this token as soon as we detect it
                   else if (state == 45){ // digit
                     list.add(new Token("Digit", lineNum, indexNum, Character.getNumericValue(next)));
-                    System.out.println(list.get(tokenNum).type + " with value "+Character.getNumericValue(next)+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                    System.out.println("Lex: " +list.get(tokenNum).type + " with value "+Character.getNumericValue(next)+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
                 
                     tokenNum = tokenNum+1;
                     state = 0;
@@ -578,11 +583,11 @@ public class Compiler_prj1 {
             if(validToken){
               if(tokName.equals("placehold")){
                 list.add(new Token(tokType, tokLine, tokIndex));
-                System.out.println(list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                System.out.println("Lex: " +list.get(tokenNum).type + " detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
               }
               else{
                 list.add(new Token(tokType, tokLine, tokIndex, tokName));
-                System.out.println(list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
+                System.out.println("Lex: " +list.get(tokenNum).type + " with name "+tokName+" detected at line " + list.get(tokenNum).lineNum + ", index " +list.get(tokenNum).indexNum);
               }
               
               tokenNum = tokenNum + 1;
@@ -602,7 +607,7 @@ public class Compiler_prj1 {
       }
       //Makes sure there are no unfinished strings
       if(isString){
-        System.out.println("Error: Ending quote not detected by end of line.");
+        System.out.println("Lex Error: Ending quote not detected by end of line.");
         errorNum++;
       }
     
@@ -612,7 +617,7 @@ public class Compiler_prj1 {
         
       if(eop){
         if(isString){
-          System.out.println("Error: Ending quote not detected by end of line.");
+          System.out.println("Lex Error: Ending quote not detected by end of line.");
           errorNum++;
         }  
         programNum++;
@@ -625,11 +630,17 @@ public class Compiler_prj1 {
         if(errorNum == 0){
           Parser parse = new Parser(list, startTokenNum);
           parse.parseProgram();
-          System.out.println(parse.parseError + " Errors detected while parsing " + programNum);
+          System.out.println("Parser Error detected in program " + programNum);
             
           if(parse.parseError == 0){
             parse.printCST();
           }
+          else{
+            System.out.println("Skipping CST due to Parse Error.");
+          }
+        }
+        else{
+          System.out.println("Skipping Parse due to Lex Error.");
         }
           
         errorNum = 0;
