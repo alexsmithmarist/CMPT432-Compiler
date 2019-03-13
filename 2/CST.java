@@ -59,16 +59,10 @@ class CST{
       traversalResult = traversalResult + "<" + node.name + ">";
       //traversalResult = traversalResult + "\n";
       System.out.println(traversalResult);
-      if(node.name.equals("char") || node.name.equals("space")){
-        for (int j = 0; j < node.children.size(); j++){
-          printTree(node.children.get(j), depth);
-        }
-      }  
+     
           
-      else{
-        for (int j = 0; j < node.children.size(); j++){
-          printTree(node.children.get(j), depth+1);
-        }
+      for (int j = 0; j < node.children.size(); j++){
+        printTree(node.children.get(j), depth+1);
       }
     }
       

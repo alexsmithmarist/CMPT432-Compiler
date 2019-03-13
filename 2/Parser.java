@@ -41,12 +41,11 @@ public class Parser{
     
   boolean parseStateList(){
     System.out.println("parse: Statement List");
-    //tree.addBranch("statement list");
+    tree.addBranch("statement list");
       
     boolean retVal = false;
     if(stream.get(i).type.equals("Print") || stream.get(i).type.equals("Id") || stream.get(i).type.equals("Int") || stream.get(i).type.equals("String") || stream.get(i).type.equals("Boolean") || stream.get(i).type.equals("While") || stream.get(i).type.equals("If") || stream.get(i).type.equals("L_Bracket")){
         
-      tree.addBranch("statement list");
       retVal = parseState();
       retVal = parseStateList();
     }
@@ -88,7 +87,7 @@ public class Parser{
   }
     
   boolean parsePrint(){
-    System.out.println("parse: Print");
+    System.out.println("parse: Print Statement");
     tree.addBranch("print statement");
       
     boolean retVal = false;
@@ -102,7 +101,7 @@ public class Parser{
   }
     
   boolean parseAssign(){
-    System.out.println("parse: Assignment");
+    System.out.println("parse: Assignment Statement");
     tree.addBranch("assignment statement");
       
     boolean retVal = false;
@@ -127,7 +126,7 @@ public class Parser{
   }
    
   boolean parseWhile(){
-    System.out.println("parse: While");
+    System.out.println("parse: While Statement");
     tree.addBranch("while statement");
       
     boolean retVal = false;
@@ -140,7 +139,7 @@ public class Parser{
   }
   
   boolean parseIf(){
-    System.out.println("parse: If");
+    System.out.println("parse: If Statement");
     tree.addBranch("if statement");
       
     boolean retVal = false;
@@ -181,6 +180,7 @@ public class Parser{
     boolean retVal = false;
     System.out.println("parse: Digit");
     retVal = match("Digit");
+    tree.endChildren();
     if(stream.get(i).type.equals("Plus")){
       System.out.println("parse: IntOp");
       retVal = match("Plus");
@@ -237,33 +237,33 @@ public class Parser{
     
   boolean parseCharList(){
     System.out.println("parse: Char List");
-    //tree.addBranch("char list");
+    tree.addBranch("char list");
       
     boolean retVal = false;
     if(stream.get(i).type.equals("char")){
-      tree.addBranch("char list");
+      //tree.addBranch("char list");
         
       if(!stream.get(i).name.equals(" ")){
         System.out.println("parse: Char");
         tree.addBranch("char");
-        tree.addBranch("char list");
+        //tree.addBranch("char list");
         
         retVal = match("char");
+        tree.endChildren();
         retVal = parseCharList();
       }
       else if(stream.get(i).name.equals(" ")){
         System.out.println("parse: Space");
         tree.addBranch("space");
-        tree.addBranch("char list");
+        //tree.addBranch("char list");
 
         retVal = match("char");
+        tree.endChildren();
         retVal = parseCharList();
       }
     }
     else{
-        /*retVal = match("char");
-         INDICATE SPACE IN CST HERE 
-        retVal = parseCharList(); */
+      /*epsilon*/
     }
       
     tree.endChildren();
@@ -340,18 +340,20 @@ public class Parser{
         }
         retVal = true;
       }
-      //System.out.println(expTok);
-      /* CST STUFF GOES HERE */
+      
       
       if(retVal == false){
         System.out.println("Parse Error: Found " + stream.get(i).type + " on line " + stream.get(i).lineNum + ", index " + stream.get(i).indexNum + " when expecting " + expTok);
         
         parseError++;
       }
+      //i++;
+    }
+    
+    if(i != stream.size()-1){
       i++;
     }
-      
-    //i++;
+    
     return retVal;
   }
     

@@ -21,8 +21,12 @@ while(a==a){
 print(01)
 }$
 
-/*This tests the proper implementation of the epsilon production in statement list*/
+/*This works for some reason*/
 {
-if true {
-}}$
+a = 1 + (a == ( b!=a))
+}$
 
+/*This caused an infinite loop before it was fixed. */
+{
+print(a==a)
+}$
