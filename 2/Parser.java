@@ -3,20 +3,26 @@ import java.util.ArrayList;
 
 public class Parser{
   
+  //Initialize needed variables
   int i = 0;
   int parseError = 0;
   ArrayList<Token> stream = new ArrayList<Token>();
   CST tree = new CST();
-    
+  
+  //Default Constructor
   public Parser(){}
-    
+  
+  //Constructor used to pass info from lexed program to parser
   public Parser(ArrayList<Token> list, int start){
     stream = list;
     i = start;
   }
-    
+
+  //Parsing of each 'sentence' is in its own method
   boolean parseProgram(){
-    System.out.println("parse: Program");
+    if(parseError == 0){
+      System.out.println("parse: Program");
+    }
     tree.addBranch("program");
     boolean retVal = false;
     parseBlock();
@@ -27,7 +33,9 @@ public class Parser{
   }
     
   boolean parseBlock(){
-    System.out.println("parse: Block");
+    if(parseError == 0){
+      System.out.println("parse: Block");
+    }
     tree.addBranch("block");
       
     boolean retVal = false;
@@ -40,7 +48,9 @@ public class Parser{
   }
     
   boolean parseStateList(){
-    System.out.println("parse: Statement List");
+    if(parseError == 0){
+      System.out.println("parse: Statement List");
+    }
     tree.addBranch("statement list");
       
     boolean retVal = false;
@@ -59,7 +69,9 @@ public class Parser{
   }
     
   boolean parseState(){
-    System.out.println("parse: Statement");
+    if(parseError == 0){
+      System.out.println("parse: Statement");
+    }
     tree.addBranch("statement");
       
     boolean retVal = false;
@@ -87,7 +99,9 @@ public class Parser{
   }
     
   boolean parsePrint(){
-    System.out.println("parse: Print Statement");
+    if(parseError == 0){
+      System.out.println("parse: Print Statement");
+    }
     tree.addBranch("print statement");
       
     boolean retVal = false;
@@ -101,7 +115,9 @@ public class Parser{
   }
     
   boolean parseAssign(){
-    System.out.println("parse: Assignment Statement");
+    if(parseError == 0){
+      System.out.println("parse: Assignment Statement");
+    }
     tree.addBranch("assignment statement");
       
     boolean retVal = false;
@@ -114,7 +130,9 @@ public class Parser{
   }
   
   boolean parseVar(){
-    System.out.println("parse: VarDecl");
+    if(parseError == 0){
+      System.out.println("parse: VarDecl");
+    }
     tree.addBranch("varDecl");
       
     boolean retVal = false;
@@ -126,7 +144,9 @@ public class Parser{
   }
    
   boolean parseWhile(){
-    System.out.println("parse: While Statement");
+    if(parseError == 0){
+      System.out.println("parse: While Statement");
+    }
     tree.addBranch("while statement");
       
     boolean retVal = false;
@@ -139,7 +159,9 @@ public class Parser{
   }
   
   boolean parseIf(){
-    System.out.println("parse: If Statement");
+    if(parseError == 0){
+      System.out.println("parse: If Statement");
+    }
     tree.addBranch("if statement");
       
     boolean retVal = false;
@@ -152,7 +174,9 @@ public class Parser{
   }
     
   boolean parseExpr(){
-    System.out.println("parse: Expression");
+    if(parseError == 0){
+      System.out.println("parse: Expression");
+    }
     tree.addBranch("Expr");
       
     boolean retVal = false;
@@ -162,7 +186,7 @@ public class Parser{
     else if(stream.get(i).type.equals("quote")){
       retVal = parseStringExpr();
     }
-    else if(stream.get(i).type.equals("L_Paren")){
+    else if(stream.get(i).type.equals("L_Paren") || stream.get(i).type.equals("True") || stream.get(i).type.equals("False") ){
       retVal = parseBooleanExpr();
     }
     else{
@@ -174,15 +198,21 @@ public class Parser{
   }
     
   boolean parseIntExpr(){
-    System.out.println("parse: Int Expression");
+    if(parseError == 0){
+      System.out.println("parse: Int Expression");
+    }
     tree.addBranch("Int Expr");
       
     boolean retVal = false;
-    System.out.println("parse: Digit");
+    if(parseError == 0){
+      System.out.println("parse: Digit");
+    }
     retVal = match("Digit");
     tree.endChildren();
     if(stream.get(i).type.equals("Plus")){
-      System.out.println("parse: IntOp");
+      if(parseError == 0){
+        System.out.println("parse: IntOp");
+      }
       retVal = match("Plus");
       retVal = parseExpr();
     }
@@ -192,7 +222,9 @@ public class Parser{
   }
     
   boolean parseStringExpr(){
-    System.out.println("parse: String Expression");
+    if(parseError == 0){
+      System.out.println("parse: String Expression");
+    }
     tree.addBranch("String Expr");
       
     boolean retVal = false;
@@ -205,7 +237,9 @@ public class Parser{
   }
     
   boolean parseBooleanExpr(){
-    System.out.println("parse: Boolean Expression");
+    if(parseError == 0){
+      System.out.println("parse: Boolean Expression");
+    }
     tree.addBranch("Boolean Expr");
       
     boolean retVal = false;
@@ -225,7 +259,9 @@ public class Parser{
   }
     
   boolean parseId(){
-    System.out.println("parse: Id");
+    if(parseError == 0){
+      System.out.println("parse: Id");
+    }
     tree.addBranch("Id");
       
     boolean retVal = false;
@@ -236,26 +272,32 @@ public class Parser{
   }
     
   boolean parseCharList(){
-    System.out.println("parse: Char List");
+    if(parseError == 0){
+      System.out.println("parse: Char List");
+    }
     tree.addBranch("char list");
       
     boolean retVal = false;
     if(stream.get(i).type.equals("char")){
-      //tree.addBranch("char list");
+      
         
       if(!stream.get(i).name.equals(" ")){
-        System.out.println("parse: Char");
+        if(parseError == 0){
+          System.out.println("parse: Char");
+        }
         tree.addBranch("char");
-        //tree.addBranch("char list");
+        
         
         retVal = match("char");
         tree.endChildren();
         retVal = parseCharList();
       }
       else if(stream.get(i).name.equals(" ")){
-        System.out.println("parse: Space");
+        if(parseError == 0){
+          System.out.println("parse: Space");
+        }
         tree.addBranch("space");
-        //tree.addBranch("char list");
+        
 
         retVal = match("char");
         tree.endChildren();
@@ -271,7 +313,9 @@ public class Parser{
   }
     
   boolean parseType(){
-    System.out.println("parse: Type");
+    if(parseError == 0){
+      System.out.println("parse: Type");
+    }
     tree.addBranch("type");
     
     boolean retVal = false;
@@ -290,7 +334,9 @@ public class Parser{
   }
     
   boolean parseBoolop(){
-    System.out.println("parse: Bool Op");
+    if(parseError == 0){
+      System.out.println("parse: Bool Op");
+    }
     tree.addBranch("bool op");
       
     boolean retVal = false;
@@ -306,7 +352,9 @@ public class Parser{
   }
     
   boolean parseBool(){
-    System.out.println("parse: Bool");
+    if(parseError == 0){
+      System.out.println("parse: Bool");
+    }
     tree.addBranch("bool");
       
     boolean retVal = false;
@@ -320,7 +368,9 @@ public class Parser{
     tree.endChildren();
     return retVal;
   }
-    
+   
+  //Matches expected token with the current token to add
+  //- nodes to the CST.
   boolean match(String expTok){
     boolean retVal = false;
     if(parseError == 0){
@@ -347,16 +397,19 @@ public class Parser{
         
         parseError++;
       }
-      //i++;
+      
     }
     
+    //This if statement prevents inputs smaller than 3
+    //- (The min size of a Block) from crashing the program.
     if(i != stream.size()-1){
       i++;
     }
     
     return retVal;
   }
-    
+  
+  //Depth First In order traversal to print CST.
   void printCST(){
     tree.printTree(tree.root, 0);
   }

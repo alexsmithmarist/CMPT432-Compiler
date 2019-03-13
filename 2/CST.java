@@ -17,8 +17,10 @@ class CST{
   CSTNode root = null;
   CSTNode current = null;
   
+  //Default Constructor
   public CST(){}
 
+  //Adding a Branch
   public void addBranch(String token){
     CSTNode node = new CSTNode(token);
     if(this.root == null){
@@ -31,6 +33,7 @@ class CST{
     this.current = node;
   }
   
+  //Adding a leaf (no children)
   public void addLeaf(String token){
     CSTNode node = new CSTNode(token);
     if(this.root == null){
@@ -41,23 +44,25 @@ class CST{
       this.current.children.add(node);
     }  
   }
-    
+  
+  //change the current node to the parent
   public void endChildren(){
     if(this.current.parent != null){
       this.current = this.current.parent;
     }
   }
 
+  //Depth First in order traversal to print the tree
   public void printTree(CSTNode node, int depth){
     String traversalResult = "";
     
     for(int i = 0; i < depth; i++){
       traversalResult = traversalResult + "-";
     }
-      
+     
+    //If the node has children, it is a branch
     if(node.children.size() != 0){
       traversalResult = traversalResult + "<" + node.name + ">";
-      //traversalResult = traversalResult + "\n";
       System.out.println(traversalResult);
      
           
@@ -65,7 +70,8 @@ class CST{
         printTree(node.children.get(j), depth+1);
       }
     }
-      
+     
+    //If the node has no children, it is a leaf.
     else{
       traversalResult = traversalResult + "[" + node.name + "] ";
       System.out.println(traversalResult);

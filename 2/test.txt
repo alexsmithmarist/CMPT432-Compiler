@@ -1,8 +1,9 @@
-/*These are the test cases for the parser*/
+/*These are the test cases for the parser. All of the statements and combinations have been tested.
+The following test cases provided interesting outcomes before they were fixed.*/
 
 /*This tests parsing charlist and the parser properly identifying characters and spaces*/
 {
-print("alex")
+print("al e x  ")
 }$
 
 /*This tests parsing while loops inside while loops*/
@@ -16,12 +17,12 @@ while(a==a){
 }
 }$
 
-/*This will fail parsing*/
+/*This will fail parsing, only single digits are allowed*/
 {
 print(01)
 }$
 
-/*This works for some reason*/
+/*This is valid in parse but will fail project 3*/
 {
 a = 1 + (a == ( b!=a))
 }$
