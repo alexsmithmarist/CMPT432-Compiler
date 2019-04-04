@@ -410,8 +410,11 @@ public class Parser{
   }
   
   //Depth First In order traversal to print CST.
-  void printCST(){
-    tree.printTree(tree.root, 0);
+  CSTNode printCST(){
+    CSTNode temp = null;
+    temp = tree.printTree(tree.root, 0);
+    
+    return temp;
   }
     
 }

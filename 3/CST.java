@@ -68,7 +68,7 @@ class CST{
   }
 
   //Depth First in order traversal to print the tree
-  public void printTree(CSTNode node, int depth){
+  public CSTNode printTree(CSTNode node, int depth){
     String traversalResult = "";
     
     for(int i = 0; i < depth; i++){
@@ -99,7 +99,7 @@ class CST{
     }
     
       
-    root = null;
+    return root;
   }
 
 }

@@ -628,16 +628,27 @@ public class Compiler_prj1 {
         
         if(errorNum == 0){
           Parser parse = new Parser(list, startTokenNum);
+          CSTNode cstRoot = null;
           parse.parseProgram();
           if(parse.parseError!=0){
             System.out.println(parse.parseError +" Parser Errors detected in program " + programNum);
           }
             
           if(parse.parseError == 0){
-            parse.printCST();
+            cstRoot = parse.printCST();
           }
           else{
             System.out.println("Skipping CST due to Parse Error.");
+          }
+            
+          //SEMANTIC IMPLEMENTATION
+            
+          if(parse.parseError == 0){
+            System.out.println();
+            Semantic p3 = new Semantic();
+            CSTNode astRoot = null;
+            astRoot = p3.construct(cstRoot);
+            p3.printAST(astRoot, 0);
           }
         }
         else{
