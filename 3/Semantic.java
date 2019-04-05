@@ -50,6 +50,15 @@ public class Semantic{
       //ast.endChildren();
     }
       
+    else if(node.tokType.equals("varDecl")){
+      ast.addBranch("Var Decl");
+      ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
+      ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum);
+     
+      ast.endChildren();
+        
+    }
+      
     if(node.children.size() != 0 && !stop){
       for (int j = 0; j < node.children.size(); j++){
         construct(node.children.get(j));
