@@ -8,17 +8,22 @@ public class Semantic{
   public Semantic(){}
       
   public CSTNode construct(CSTNode node){
+  
     if(node.tokType.equals("L_Bracket")){
       ast.addBranch("Block"); 
     }
+      
     else if(node.tokType.equals("R_Bracket")){
       ast.endChildren();
     }
+      
     else if(node.tokType.equals("Print")){
       ast.addBranch("Print");
         
       CSTNode expr = null;
       expr = node.parent.children.get(2);
+        
+      /* USE THIS FOR EXPR FUNCTION TO BE MADE LATER
       if(expr.children.get(0).tokType.equals("Id")){
         ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
         ast.endChildren();
@@ -29,7 +34,7 @@ public class Semantic{
           ast.endChildren();
         }
         else{
-         //COME BACK HERE WHEN WE IMPLEMENT ADDING
+         //EXPR FUNCTION GOES HERE
         }
       }
       else if(expr.children.get(0).tokType.equals("Boolean Expr")){
@@ -38,16 +43,15 @@ public class Semantic{
           ast.endChildren();
         }
         else{
-          //COMPLEX BOOLEANS
+          //BOOLEAN EXPR FUNCTION GOES HERE
         }
       }
       else if(expr.children.get(0).tokType.equals("String Expr")){
         //STRING COMBINATION
       }
       
-        
-        
-      //ast.endChildren();
+      */ 
+    
     }
       
     else if(node.tokType.equals("varDecl")){
@@ -57,6 +61,40 @@ public class Semantic{
      
       ast.endChildren();
         
+    }
+      
+    else if(node.tokType.equals("assignment statement")){
+      ast.addBranch("Assignment");
+      ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
+        
+      //EXPR CHILD
+      //makeExpr(node.parent.children.get(2));
+        
+      ast.endChildren();
+    }
+      
+    else if(node.tokType.equals("while statement")){
+      ast.addBranch("While");
+      
+      //BOOLEXPR CHILD
+      //makeBoolExpr(node.parent.children.get(1))
+        
+      //BLOCK CHILD
+      construct(node.children.get(2).children.get(0));
+        
+      ast.endChildren();
+    }
+      
+    else if(node.tokType.equals("if statement")){
+      ast.addBranch("If");
+      
+      //BOOLEXPR CHILD
+      //makeBoolExpr(node.parent.children.get(1))
+        
+      //BLOCK CHILD
+      construct(node.children.get(2).children.get(0));
+        
+      ast.endChildren();
     }
       
     if(node.children.size() != 0 && !stop){
