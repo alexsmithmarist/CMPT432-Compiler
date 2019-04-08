@@ -23,7 +23,7 @@ public class Semantic{
       CSTNode expr = null;
       expr = node.children.get(2);
         
-      makeExpr(expr);
+      makeExpr(expr, 0);
       ast.endChildren();
     }
       
@@ -41,7 +41,7 @@ public class Semantic{
       ast.addLeaf(node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
         
       //EXPR CHILD
-      makeExpr(node.children.get(2));
+      makeExpr(node.children.get(2), 0);
         
       ast.endChildren();
     }
@@ -64,9 +64,9 @@ public class Semantic{
           ast.addBranch("Not Equal");
         }
           
-        makeExpr(node.children.get(1).children.get(1));
-        makeExpr(node.children.get(1).children.get(3));
-        ast.endChildren();
+        makeExpr(node.children.get(1).children.get(1), 1);
+        makeExpr(node.children.get(1).children.get(3), 0);
+        //ast.endChildren();
       }
         
       //BLOCK CHILD
@@ -93,15 +93,16 @@ public class Semantic{
           ast.addBranch("Not Equal");
         }
           
-        makeExpr(node.children.get(1).children.get(1));
-        makeExpr(node.children.get(1).children.get(3));
-        ast.endChildren();
+        makeExpr(node.children.get(1).children.get(1), 1);
+        makeExpr(node.children.get(1).children.get(3), 0);
+        //ast.endChildren();
       }
         
       //BLOCK CHILD
-      construct(node.children.get(2).children.get(0));
+      //construct(node.children.get(2).children.get(0));
         
-      ast.endChildren();
+      //ast.endChildren();
+      
     }
       
     if(node.children.size() != 0 && !stop){
@@ -110,28 +111,29 @@ public class Semantic{
       }
     }
      
-    
     return ast.root;
   }
     
-  public void makeExpr(CSTNode expr){
+  public void makeExpr(CSTNode expr, int temp){
     if(expr.children.get(0).tokType.equals("Id")){
       ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
-        
-      //ast.endChildren();
+       
+      if(temp == 0){
+        ast.endChildren();
+      }
     }
       
     else if(expr.children.get(0).tokType.equals("Int Expr")){
       if(expr.children.get(0).children.size() == 1){
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
           
-        //ast.endChildren();
+        ast.endChildren();
       }
       else{
         ast.addBranch("Add");
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
         
-        makeExpr(expr.children.get(0).children.get(2));
+        makeExpr(expr.children.get(0).children.get(2), 0);
           
         //ast.endChildren();
         
@@ -142,7 +144,7 @@ public class Semantic{
       if(expr.children.get(0).children.size() == 1){
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
           
-        //ast.endChildren();
+        ast.endChildren();
       }
       else{
         if(expr.children.get(0).children.get(2).children.get(0).tokType.equals("equal")){
@@ -152,8 +154,8 @@ public class Semantic{
           ast.addBranch("Not Equal");
         }
           
-        makeExpr(expr.children.get(0).children.get(1));
-        makeExpr(expr.children.get(0).children.get(3));
+        makeExpr(expr.children.get(0).children.get(1),1);
+        makeExpr(expr.children.get(0).children.get(3), 0);
         ast.endChildren();
         
       }
@@ -161,7 +163,15 @@ public class Semantic{
     }
       
     else if(expr.children.get(0).tokType.equals("String Expr")){
-      //STRING COMBINATION
+      String word = "";
+      CSTNode start = expr.children.get(0).children.get(1);
+        
+      while(start.children.size() != 0){
+        word = word + start.children.get(0).children.get(0).name;
+        start = start.children.get(1);
+      }
+        
+      ast.addLeaf(word, "String", expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum+1) ;
     }
   }
     
