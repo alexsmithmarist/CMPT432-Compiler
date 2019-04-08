@@ -17,41 +17,14 @@ public class Semantic{
       ast.endChildren();
     }
       
-    else if(node.tokType.equals("Print")){
+    else if(node.tokType.equals("print statement")){
       ast.addBranch("Print");
         
       CSTNode expr = null;
-      expr = node.parent.children.get(2);
+      expr = node.children.get(2);
         
-      /* USE THIS FOR EXPR FUNCTION TO BE MADE LATER
-      if(expr.children.get(0).tokType.equals("Id")){
-        ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
-        ast.endChildren();
-      }
-      else if(expr.children.get(0).tokType.equals("Int Expr")){
-        if(expr.children.get(0).children.size() == 1){
-          ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
-          ast.endChildren();
-        }
-        else{
-         //EXPR FUNCTION GOES HERE
-        }
-      }
-      else if(expr.children.get(0).tokType.equals("Boolean Expr")){
-        if(expr.children.get(0).children.size() == 1){
-          ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
-          ast.endChildren();
-        }
-        else{
-          //BOOLEAN EXPR FUNCTION GOES HERE
-        }
-      }
-      else if(expr.children.get(0).tokType.equals("String Expr")){
-        //STRING COMBINATION
-      }
-      
-      */ 
-    
+      makeExpr(expr);
+      ast.endChildren();
     }
       
     else if(node.tokType.equals("varDecl")){
@@ -65,10 +38,10 @@ public class Semantic{
       
     else if(node.tokType.equals("assignment statement")){
       ast.addBranch("Assignment");
-      ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
+      ast.addLeaf(node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
         
       //EXPR CHILD
-      //makeExpr(node.parent.children.get(2));
+      makeExpr(node.children.get(2));
         
       ast.endChildren();
     }
@@ -76,8 +49,25 @@ public class Semantic{
     else if(node.tokType.equals("while statement")){
       ast.addBranch("While");
       
-      //BOOLEXPR CHILD
-      //makeBoolExpr(node.parent.children.get(1))
+      if(node.children.get(1).children.size() == 1){
+        ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum);
+          
+        //ast.endChildren();
+      }
+        
+      else{
+          
+        if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
+          ast.addBranch("Equal");
+        }
+        else{
+          ast.addBranch("Not Equal");
+        }
+          
+        makeExpr(node.children.get(1).children.get(1));
+        makeExpr(node.children.get(1).children.get(3));
+        ast.endChildren();
+      }
         
       //BLOCK CHILD
       construct(node.children.get(2).children.get(0));
@@ -88,8 +78,25 @@ public class Semantic{
     else if(node.tokType.equals("if statement")){
       ast.addBranch("If");
       
-      //BOOLEXPR CHILD
-      //makeBoolExpr(node.parent.children.get(1))
+      if(node.children.get(1).children.size() == 1){
+        ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum);
+          
+        //ast.endChildren();
+      }
+        
+      else{
+          
+        if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
+          ast.addBranch("Equal");
+        }
+        else{
+          ast.addBranch("Not Equal");
+        }
+          
+        makeExpr(node.children.get(1).children.get(1));
+        makeExpr(node.children.get(1).children.get(3));
+        ast.endChildren();
+      }
         
       //BLOCK CHILD
       construct(node.children.get(2).children.get(0));
@@ -105,6 +112,57 @@ public class Semantic{
      
     
     return ast.root;
+  }
+    
+  public void makeExpr(CSTNode expr){
+    if(expr.children.get(0).tokType.equals("Id")){
+      ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
+        
+      //ast.endChildren();
+    }
+      
+    else if(expr.children.get(0).tokType.equals("Int Expr")){
+      if(expr.children.get(0).children.size() == 1){
+        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
+          
+        //ast.endChildren();
+      }
+      else{
+        ast.addBranch("Add");
+        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
+        
+        makeExpr(expr.children.get(0).children.get(2));
+          
+        //ast.endChildren();
+        
+      }
+    }
+      
+    else if(expr.children.get(0).tokType.equals("Boolean Expr")){
+      if(expr.children.get(0).children.size() == 1){
+        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
+          
+        //ast.endChildren();
+      }
+      else{
+        if(expr.children.get(0).children.get(2).children.get(0).tokType.equals("equal")){
+          ast.addBranch("Equal");
+        }
+        else{
+          ast.addBranch("Not Equal");
+        }
+          
+        makeExpr(expr.children.get(0).children.get(1));
+        makeExpr(expr.children.get(0).children.get(3));
+        ast.endChildren();
+        
+      }
+      
+    }
+      
+    else if(expr.children.get(0).tokType.equals("String Expr")){
+      //STRING COMBINATION
+    }
   }
     
   public void printAST(CSTNode node, int depth){
