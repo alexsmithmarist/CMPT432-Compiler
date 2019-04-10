@@ -1,8 +1,14 @@
+import java.util.*;
+
+
 public class Semantic{
   int typeError = 0;
   CST ast = new CST();
   CST tree = null;
   boolean stop = false;
+  ArrayList<Scope> symTable = new ArrayList<Scope>();
+  int currentScope = -1;
+  
 
     
   public Semantic(){}
@@ -11,10 +17,20 @@ public class Semantic{
   
     if(node.tokType.equals("L_Bracket")){
       ast.addBranch("Block"); 
+      if(currentScope == -1){
+        symTable.add(new Scope());
+      }
+      else{
+        symTable.add(new Scope(currentScope));
+      }
+      currentScope = currentScope + 1;
     }
       
     else if(node.tokType.equals("R_Bracket")){
       ast.endChildren();
+      if(symTable.get(currentScope).parent != -99){
+        currentScope = symTable.get(currentScope).parent;
+      }
     }
       
     else if(node.tokType.equals("print statement")){
@@ -32,6 +48,8 @@ public class Semantic{
       ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
       ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum);
      
+      symTable.get(currentScope).inTable(node.children.get(1).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);
+        
       ast.endChildren();
         
     }
@@ -197,6 +215,68 @@ public class Semantic{
       for (int j = 0; j < node.children.size(); j++){
         printAST(node.children.get(j), depth+1);
       }
+    }
+  }
+}
+
+class sNode {
+  String sName = "";
+  String sType = "";
+  int sLine = 0;
+  int sScope = 0;
+  int sIndex = 0;
+  boolean use = false;
+  boolean init = false;
+    
+  public sNode(){}
+
+  public sNode(String name, String type, int line, int index, int scope){
+    sName = name;
+    sType = type;
+    sLine = line;
+    sIndex = index;
+    sScope = scope;
+  }
+}
+
+class Scope{
+  int parent = -99;
+  sNode[] table = new sNode [26];
+    
+  public Scope(){
+    for(int i = 0; i != 26; i++){
+      table[i] = null;
+    }
+  }
+
+  public Scope(int p){
+    parent = p;
+      
+    for(int i = 0; i != 26; i++){
+      table[i] = null;
+    }
+  }
+    
+  public void inTable(String id, String type, int line, int index, int scope){
+    char[] alpha = new char[] 
+    {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+     'p','q','r','s','t','u','v','w','x','y','z'};
+      
+    char next = id.charAt(0);
+    int currentCol = 0;
+      
+    for(int j = 0; j < alpha.length; j++){
+      if(next == alpha[j]){
+        currentCol = j;
+      }
+    }
+    sNode temp = new sNode(id, type, line, index, scope);
+    
+    if(table[currentCol] == null){
+      table[currentCol] = temp;
+    }
+    else{
+      System.out.println("Semantic Error: Redeclared variable " +id+ " in scope " + scope + " on line "+line+ ", index "+index);
     }
   }
 }
