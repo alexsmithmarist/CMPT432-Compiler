@@ -55,11 +55,14 @@ public class Semantic{
     }
       
     else if(node.tokType.equals("assignment statement")){
+      String type = "";
       ast.addBranch("Assignment");
       ast.addLeaf(node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
         
       //EXPR CHILD
-      makeExpr(node.children.get(2), 0);
+      type = makeExpr(node.children.get(2), 0);
+        
+      symTable.get(currentScope).typeCheck(node.children.get(0).children.get(0).name, type, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope, symTable);
         
       ast.endChildren();
     }
@@ -74,7 +77,9 @@ public class Semantic{
       }
         
       else{
-          
+        String type1 = "";
+        String type2 = "";
+        
         if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
           ast.addBranch("Equal");
         }
@@ -82,8 +87,8 @@ public class Semantic{
           ast.addBranch("Not Equal");
         }
           
-        makeExpr(node.children.get(1).children.get(1), 1);
-        makeExpr(node.children.get(1).children.get(3), 0);
+        type1 = makeExpr(node.children.get(1).children.get(1), 1);
+        type2 = makeExpr(node.children.get(1).children.get(3), 0);
         //ast.endChildren();
       }
         
@@ -103,6 +108,8 @@ public class Semantic{
       }
         
       else{
+        String type1 = "";
+        String type2 = "";
           
         if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
           ast.addBranch("Equal");
@@ -111,8 +118,8 @@ public class Semantic{
           ast.addBranch("Not Equal");
         }
           
-        makeExpr(node.children.get(1).children.get(1), 1);
-        makeExpr(node.children.get(1).children.get(3), 0);
+        type1 = makeExpr(node.children.get(1).children.get(1), 1);
+        type2 = makeExpr(node.children.get(1).children.get(3), 0);
         //ast.endChildren();
       }
         
@@ -132,13 +139,15 @@ public class Semantic{
     return ast.root;
   }
     
-  public void makeExpr(CSTNode expr, int temp){
+  public String makeExpr(CSTNode expr, int temp){
     if(expr.children.get(0).tokType.equals("Id")){
       ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
        
       if(temp == 0){
         ast.endChildren();
       }
+        
+      return "Id";
     }
       
     else if(expr.children.get(0).tokType.equals("Int Expr")){
@@ -148,14 +157,17 @@ public class Semantic{
         ast.endChildren();
       }
       else{
+        String xtype = "";
         ast.addBranch("Add");
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
         
-        makeExpr(expr.children.get(0).children.get(2), 0);
+        xtype = makeExpr(expr.children.get(0).children.get(2), 0);
           
         //ast.endChildren();
         
       }
+        
+      return "Int";
     }
       
     else if(expr.children.get(0).tokType.equals("Boolean Expr")){
@@ -165,6 +177,8 @@ public class Semantic{
         ast.endChildren();
       }
       else{
+        String xtype1 = "";
+        String xtype2 = "";
         if(expr.children.get(0).children.get(2).children.get(0).tokType.equals("equal")){
           ast.addBranch("Equal");
         }
@@ -172,12 +186,12 @@ public class Semantic{
           ast.addBranch("Not Equal");
         }
           
-        makeExpr(expr.children.get(0).children.get(1),1);
-        makeExpr(expr.children.get(0).children.get(3), 0);
+        xtype1 = makeExpr(expr.children.get(0).children.get(1),1);
+        xtype2 = makeExpr(expr.children.get(0).children.get(3), 0);
         ast.endChildren();
         
       }
-      
+      return "Boolean";
     }
       
     else if(expr.children.get(0).tokType.equals("String Expr")){
@@ -190,7 +204,10 @@ public class Semantic{
       }
         
       ast.addLeaf(word, "String", expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum+1) ;
+        
+      return "String";
     }
+    return "Error";
   }
     
   public void printAST(CSTNode node, int depth){
@@ -277,6 +294,33 @@ class Scope{
     }
     else{
       System.out.println("Semantic Error: Redeclared variable " +id+ " in scope " + scope + " on line "+line+ ", index "+index);
+    }
+  }
+    
+  public void typeCheck(String id, String type, int line, int index, int scope, ArrayList<Scope> tbl){
+    char[] alpha = new char[] 
+    {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+     'p','q','r','s','t','u','v','w','x','y','z'};
+      
+    char next = id.charAt(0);
+    int currentCol = 0;
+      
+    for(int j = 0; j < alpha.length; j++){
+      if(next == alpha[j]){
+        currentCol = j;
+      }
+    }
+      
+    if(table[currentCol] == null && parent != -99){
+      tbl.get(parent).typeCheck(id, type, line, index, parent, tbl);
+    }
+    else if(table[currentCol] == null && parent == -99){
+      System.out.println("Semantic Error: Variable " +id+ " used before declared on line " +line+ " index "+index);
+    }
+    else if(table[currentCol] != null){
+      if(!(table[currentCol].sType.equals(type))){
+        System.out.println("Semantic Error: Type mismatch variable " +id+" on line " +line+ " index "+index+" expecting "+type+", got "+table[currentCol].sType);
+      }
     }
   }
 }
