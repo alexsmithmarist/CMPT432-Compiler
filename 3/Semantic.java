@@ -8,6 +8,7 @@ public class Semantic{
   boolean stop = false;
   ArrayList<Scope> symTable = new ArrayList<Scope>();
   int currentScope = -1;
+  boolean exist = false;
   
 
     
@@ -89,13 +90,16 @@ public class Semantic{
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
+        if(!(type1.equals(type2))){
+          System.out.println("Semantic Error: Type Mismatch in while statement");
+        }
         //ast.endChildren();
       }
         
       //BLOCK CHILD
-      construct(node.children.get(2).children.get(0));
+      //construct(node.children.get(2).children.get(0));
         
-      ast.endChildren();
+      //ast.endChildren();
     }
       
     else if(node.tokType.equals("if statement")){
@@ -120,6 +124,9 @@ public class Semantic{
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
+        if(!(type1.equals(type2))){
+          System.out.println("Semantic Error: Type Mismatch in if statement");
+        }
         //ast.endChildren();
       }
         
@@ -142,12 +149,20 @@ public class Semantic{
   public String makeExpr(CSTNode expr, int temp){
     if(expr.children.get(0).tokType.equals("Id")){
       ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
-       
+    
+      exist = symTable.get(currentScope).existCheck(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum, currentScope, symTable);
       if(temp == 0){
         ast.endChildren();
       }
-        
-      return "Id";
+      
+      if(exist){
+        return symTable.get(currentScope).getType(expr.children.get(0).children.get(0).name, symTable);
+      }
+      else{
+        exist = false;
+        return "Id";
+      }
+      
     }
       
     else if(expr.children.get(0).tokType.equals("Int Expr")){
@@ -163,6 +178,9 @@ public class Semantic{
         
         xtype = makeExpr(expr.children.get(0).children.get(2), 0);
           
+        if(!(xtype.equals("Int"))){
+          System.out.println("Semantic Error: Expected Int when adding on line " +expr.children.get(0).children.get(0).children.get(0).lineNum +", got " +xtype);
+        }
         //ast.endChildren();
         
       }
@@ -188,6 +206,9 @@ public class Semantic{
           
         xtype1 = makeExpr(expr.children.get(0).children.get(1),1);
         xtype2 = makeExpr(expr.children.get(0).children.get(3), 0);
+        if(!(xtype1.equals(xtype2))){
+          System.out.println("Semantic Error: Type Mismatch in boolean expression statement");
+        }
         ast.endChildren();
         
       }
@@ -321,6 +342,66 @@ class Scope{
       if(!(table[currentCol].sType.equals(type))){
         System.out.println("Semantic Error: Type mismatch variable " +id+" on line " +line+ " index "+index+" expecting "+type+", got "+table[currentCol].sType);
       }
+      else{
+        table[currentCol].init = true;
+      }
     }
+  }
+    
+  public boolean existCheck(String id, int line, int index, int scope, ArrayList<Scope> tbl){
+    boolean ifexist = false;
+    char[] alpha = new char[] 
+    {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+     'p','q','r','s','t','u','v','w','x','y','z'};
+      
+    char next = id.charAt(0);
+    int currentCol = 0;
+      
+    for(int j = 0; j < alpha.length; j++){
+      if(next == alpha[j]){
+        currentCol = j;
+      }
+    }
+      
+    if(table[currentCol] == null && parent != -99){
+      tbl.get(parent).existCheck(id, line, index, parent, tbl);
+    }
+    else if(table[currentCol] == null && parent == -99){
+      System.out.println("Semantic Error: Variable " +id+ " used before declared on line " +line+ " index "+index);
+      ifexist = false;
+    }
+    else if(table[currentCol] != null){
+      table[currentCol].use = true;
+      ifexist = true;
+    }
+    return ifexist;
+  }
+    
+  public String getType(String id, ArrayList<Scope> tbl){
+    String ktype = "";
+    char[] alpha = new char[] 
+    {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+     'p','q','r','s','t','u','v','w','x','y','z'};
+      
+    char next = id.charAt(0);
+    int currentCol = 0;
+      
+    for(int j = 0; j < alpha.length; j++){
+      if(next == alpha[j]){
+        currentCol = j;
+      }
+    }
+      
+    if(table[currentCol] !=null){
+      ktype = table[currentCol].sType;
+    }
+    else if(table[currentCol] == null && parent != -99){
+      tbl.get(parent).getType(id, tbl);
+    }
+    else{
+      ktype = "Error";
+    }
+      
+    return ktype;
   }
 }
