@@ -25,7 +25,7 @@ public class Semantic{
       else{
         symTable.add(new Scope(currentScope));
       }
-      currentScope = currentScope + 1;
+      currentScope = symTable.size()-1;
     }
       
     else if(node.tokType.equals("R_Bracket")){
@@ -68,7 +68,7 @@ public class Semantic{
       //EXPR CHILD
       type = makeExpr(node.children.get(2), 0);
         
-      err = symTable.get(currentScope).typeCheck(node.children.get(0).children.get(0).name, type, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope, symTable);
+      err = symTable.get(currentScope).typeCheck(node.children.get(0).children.get(0).name, type, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope, symTable, currentScope);
         
       if(err == true){
         typeError = typeError + 1;
@@ -162,7 +162,7 @@ public class Semantic{
     if(expr.children.get(0).tokType.equals("Id")){
       ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
     
-      exist = symTable.get(currentScope).existCheck(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum, currentScope, symTable);
+      exist = symTable.get(currentScope).existCheck(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum, currentScope, symTable, currentScope);
       if(temp == 0){
         ast.endChildren();
       }
@@ -308,9 +308,9 @@ public class Semantic{
           if(symTable.get(i).table[j].use == false && symTable.get(i).table[j].init == false){
             System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " declared but not used or initialized.");
           }
-          else if(symTable.get(i).table[j].use == true && symTable.get(i).table[j].init == false){
-            System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " used but not initialized.");
-          }
+          /*else if(symTable.get(i).table[j].use == true && symTable.get(i).table[j].init == false){
+            System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " used but not initialized."); 
+          }*/
           else if(symTable.get(i).table[j].use == false && symTable.get(i).table[j].init == true){
             System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " initialized but not used.");
           }
@@ -328,6 +328,7 @@ class sNode {
   int sIndex = 0;
   boolean use = false;
   boolean init = false;
+  ArrayList<Integer> initscope = new ArrayList<>();
     
   public sNode(){}
 
@@ -386,7 +387,7 @@ class Scope{
     return err;
   }
     
-  public boolean typeCheck(String id, String type, int line, int index, int scope, ArrayList<Scope> tbl){
+  public boolean typeCheck(String id, String type, int line, int index, int scope, ArrayList<Scope> tbl, int fScope){
     boolean err = false;
     char[] alpha = new char[] 
     {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
@@ -402,7 +403,7 @@ class Scope{
     }
       
     if(table[currentCol] == null && parent != -99){
-      tbl.get(parent).typeCheck(id, type, line, index, parent, tbl);
+      err = tbl.get(parent).typeCheck(id, type, line, index, parent, tbl, fScope);
     }
     else if(table[currentCol] == null && parent == -99){
       System.out.println("Semantic Error: Variable " +id+ " used before declared on line " +line+ " index "+index);
@@ -415,6 +416,7 @@ class Scope{
       }
       else{
         table[currentCol].init = true;
+        table[currentCol].initscope.add(fScope);
         err = false;
       }
     }
@@ -422,8 +424,9 @@ class Scope{
     return err;
   }
     
-  public boolean existCheck(String id, int line, int index, int scope, ArrayList<Scope> tbl){
+  public boolean existCheck(String id, int line, int index, int scope, ArrayList<Scope> tbl, int fScope){
     boolean ifexist = false;
+    boolean initialized = false;
     char[] alpha = new char[] 
     {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
      'p','q','r','s','t','u','v','w','x','y','z'};
@@ -438,7 +441,7 @@ class Scope{
     }
       
     if(table[currentCol] == null && parent != -99){
-      ifexist = tbl.get(parent).existCheck(id, line, index, parent, tbl);
+      ifexist = tbl.get(parent).existCheck(id, line, index, parent, tbl, fScope);
     }
     else if(table[currentCol] == null && parent == -99){
       System.out.println("Semantic Error: Variable " +id+ " used before declared on line " +line+ " index "+index);
@@ -446,6 +449,8 @@ class Scope{
     }
     else if(table[currentCol] != null){
       table[currentCol].use = true;
+      initialized = this.initCheck(id, line, index, fScope, tbl);
+      
       ifexist = true;
     }
 
@@ -478,5 +483,42 @@ class Scope{
     }
       
     return ktype;
+  }
+    
+  public boolean initCheck(String id, int line, int index, int scope, ArrayList<Scope> tbl){
+    boolean ifexist = false;
+    char[] alpha = new char[] 
+    {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+     'p','q','r','s','t','u','v','w','x','y','z'};
+      
+    char next = id.charAt(0);
+    int currentCol = 0;
+      
+    for(int j = 0; j < alpha.length; j++){
+      if(next == alpha[j]){
+        currentCol = j;
+      }
+    }
+      
+    for(int i = 0; i < table[currentCol].initscope.size(); i++){
+      if(table[currentCol].initscope.get(i) == scope){
+        /*System.out.println(table[currentCol].initscope.get(i));
+        System.out.println(scope);
+        System.out.println();*/
+        ifexist = true;
+      }
+    }
+   
+    if(!ifexist){
+      if(parent != -99){
+        ifexist = initCheck(id, line, index, parent, tbl);
+      }
+      else{
+        System.out.println("Semantic Warning: Variable " + id +" in scope " + scope + " used on line "+ line+" index "+index+" but not initialized.");
+        System.out.println();
+      }
+    }
+    
+    return ifexist;
   }
 }
