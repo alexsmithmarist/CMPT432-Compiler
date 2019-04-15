@@ -9,6 +9,7 @@ public class Semantic{
   ArrayList<Scope> symTable = new ArrayList<Scope>();
   int currentScope = -1;
   boolean exist = false;
+  boolean err = false;
   
 
     
@@ -49,8 +50,12 @@ public class Semantic{
       ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
       ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum);
      
-      symTable.get(currentScope).inTable(node.children.get(1).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);
+      err = symTable.get(currentScope).inTable(node.children.get(1).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);
         
+      if(err == true){
+        typeError = typeError +1;
+      }
+      err = false;
       ast.endChildren();
         
     }
@@ -63,8 +68,13 @@ public class Semantic{
       //EXPR CHILD
       type = makeExpr(node.children.get(2), 0);
         
-      symTable.get(currentScope).typeCheck(node.children.get(0).children.get(0).name, type, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope, symTable);
+      err = symTable.get(currentScope).typeCheck(node.children.get(0).children.get(0).name, type, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope, symTable);
         
+      if(err == true){
+        typeError = typeError + 1;
+      }
+        
+      err = false;
       ast.endChildren();
     }
       
@@ -92,6 +102,7 @@ public class Semantic{
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
         if(!(type1.equals(type2))){
           System.out.println("Semantic Error: Type Mismatch in while statement");
+          typeError = typeError + 1;
         }
         //ast.endChildren();
       }
@@ -126,6 +137,7 @@ public class Semantic{
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
         if(!(type1.equals(type2))){
           System.out.println("Semantic Error: Type Mismatch in if statement");
+          typeError = typeError +1;
         }
         //ast.endChildren();
       }
@@ -155,11 +167,14 @@ public class Semantic{
         ast.endChildren();
       }
       
+      //System.out.println(exist);
       if(exist){
         return symTable.get(currentScope).getType(expr.children.get(0).children.get(0).name, symTable);
       }
       else{
         exist = false;
+        //System.out.println("test");
+        typeError = typeError +1;
         return "Id";
       }
       
@@ -180,6 +195,7 @@ public class Semantic{
           
         if(!(xtype.equals("Int"))){
           System.out.println("Semantic Error: Expected Int when adding on line " +expr.children.get(0).children.get(0).children.get(0).lineNum +", got " +xtype);
+          typeError = typeError + 1;
         }
         //ast.endChildren();
         
@@ -208,6 +224,7 @@ public class Semantic{
         xtype2 = makeExpr(expr.children.get(0).children.get(3), 0);
         if(!(xtype1.equals(xtype2))){
           System.out.println("Semantic Error: Type Mismatch in boolean expression statement");
+          typeError = typeError +1;
         }
         ast.endChildren();
         
@@ -240,11 +257,21 @@ public class Semantic{
      
     //If the node has children, it is a branch
     if(node.name == null){
-      traversalResult = traversalResult + "<" + node.tokType + ">";
+      if(node.children.size() != 0){
+        traversalResult = traversalResult + "<" + node.tokType + ">";
+      }
+      else{
+        traversalResult = traversalResult + "[" + node.tokType + "]";
+      }
       System.out.println(traversalResult);
     }
     else{
-      traversalResult = traversalResult + "<" + node.name + ">";
+      if(node.children.size() != 0){
+        traversalResult = traversalResult + "<" + node.name + ">";
+      }
+      else{
+        traversalResult = traversalResult + "[" + node.name + "]";
+      }
       System.out.println(traversalResult);
     }
      
@@ -252,6 +279,42 @@ public class Semantic{
     if(node.children.size() != 0){
       for (int j = 0; j < node.children.size(); j++){
         printAST(node.children.get(j), depth+1);
+      }
+    }
+  }
+    
+  public void printSym(){
+    for(int i = 0; i < symTable.size(); i++){
+      for(int j = 0; j < 26; j++){
+        if(symTable.get(i).table[j] != null){
+          if(symTable.get(i).table[j].sType.equals("Int")){
+            System.out.println("Id: " + symTable.get(i).table[j].sName + "     Type: " + symTable.get(i).table[j].sType + "      Scope: " + symTable.get(i).table[j].sScope);
+          }
+          else if(symTable.get(i).table[j].sType.equals("String")){
+            System.out.println("Id: " + symTable.get(i).table[j].sName + "     Type: " + symTable.get(i).table[j].sType + "   Scope: " + symTable.get(i).table[j].sScope);
+          }
+          else if(symTable.get(i).table[j].sType.equals("Boolean")){
+            System.out.println("Id: " + symTable.get(i).table[j].sName + "     Type: " + symTable.get(i).table[j].sType + "  Scope: " + symTable.get(i).table[j].sScope);
+          }
+        }
+      }
+    }
+  }
+    
+  public void warnCheck(){
+    for(int i = 0; i < symTable.size(); i++){
+      for(int j = 0; j < 26; j++){
+        if(symTable.get(i).table[j] != null){
+          if(symTable.get(i).table[j].use == false && symTable.get(i).table[j].init == false){
+            System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " declared but not used or initialized.");
+          }
+          else if(symTable.get(i).table[j].use == true && symTable.get(i).table[j].init == false){
+            System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " used but not initialized.");
+          }
+          else if(symTable.get(i).table[j].use == false && symTable.get(i).table[j].init == true){
+            System.out.println("Semantic Warning: Variable " + symTable.get(i).table[j].sName +" in scope " + symTable.get(i).table[j].sScope + " initialized but not used.");
+          }
+        }
       }
     }
   }
@@ -295,7 +358,8 @@ class Scope{
     }
   }
     
-  public void inTable(String id, String type, int line, int index, int scope){
+  public boolean inTable(String id, String type, int line, int index, int scope){
+    boolean err = false;
     char[] alpha = new char[] 
     {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
      'p','q','r','s','t','u','v','w','x','y','z'};
@@ -312,13 +376,18 @@ class Scope{
     
     if(table[currentCol] == null){
       table[currentCol] = temp;
+      err = false;
     }
     else{
       System.out.println("Semantic Error: Redeclared variable " +id+ " in scope " + scope + " on line "+line+ ", index "+index);
+      err = true;
     }
+      
+    return err;
   }
     
-  public void typeCheck(String id, String type, int line, int index, int scope, ArrayList<Scope> tbl){
+  public boolean typeCheck(String id, String type, int line, int index, int scope, ArrayList<Scope> tbl){
+    boolean err = false;
     char[] alpha = new char[] 
     {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
      'p','q','r','s','t','u','v','w','x','y','z'};
@@ -337,15 +406,20 @@ class Scope{
     }
     else if(table[currentCol] == null && parent == -99){
       System.out.println("Semantic Error: Variable " +id+ " used before declared on line " +line+ " index "+index);
+      err = true;
     }
     else if(table[currentCol] != null){
       if(!(table[currentCol].sType.equals(type))){
         System.out.println("Semantic Error: Type mismatch variable " +id+" on line " +line+ " index "+index+" expecting "+type+", got "+table[currentCol].sType);
+        err = true;
       }
       else{
         table[currentCol].init = true;
+        err = false;
       }
     }
+      
+    return err;
   }
     
   public boolean existCheck(String id, int line, int index, int scope, ArrayList<Scope> tbl){
@@ -364,7 +438,7 @@ class Scope{
     }
       
     if(table[currentCol] == null && parent != -99){
-      tbl.get(parent).existCheck(id, line, index, parent, tbl);
+      ifexist = tbl.get(parent).existCheck(id, line, index, parent, tbl);
     }
     else if(table[currentCol] == null && parent == -99){
       System.out.println("Semantic Error: Variable " +id+ " used before declared on line " +line+ " index "+index);
@@ -374,6 +448,7 @@ class Scope{
       table[currentCol].use = true;
       ifexist = true;
     }
+
     return ifexist;
   }
     

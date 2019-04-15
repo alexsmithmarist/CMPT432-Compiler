@@ -649,6 +649,17 @@ public class Compiler_prj1 {
             CSTNode astRoot = null;
             astRoot = p3.construct(cstRoot);
             p3.printAST(astRoot, 0);
+              
+            if(p3.typeError > 0){
+              System.out.println("Detected " + p3.typeError +" Semantic Errors. Skipping Symbol Table");
+            }
+            else{
+              System.out.println();
+              System.out.println("Symbol Table");
+              p3.printSym();
+              System.out.println();
+              p3.warnCheck();
+            }
           }
         }
         else{
