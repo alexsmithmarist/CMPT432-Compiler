@@ -101,7 +101,7 @@ public class Semantic{
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
         if(!(type1.equals(type2))){
-          System.out.println("Semantic Error: Type Mismatch in while statement");
+          System.out.println("Semantic Error: Type Mismatch in while statement in scope " + currentScope);
           typeError = typeError + 1;
         }
         //ast.endChildren();
@@ -136,7 +136,7 @@ public class Semantic{
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
         if(!(type1.equals(type2))){
-          System.out.println("Semantic Error: Type Mismatch in if statement");
+          System.out.println("Semantic Error: Type Mismatch in if statement in scope " + currentScope);
           typeError = typeError +1;
         }
         //ast.endChildren();
@@ -223,7 +223,7 @@ public class Semantic{
         xtype1 = makeExpr(expr.children.get(0).children.get(1),1);
         xtype2 = makeExpr(expr.children.get(0).children.get(3), 0);
         if(!(xtype1.equals(xtype2))){
-          System.out.println("Semantic Error: Type Mismatch in boolean expression statement");
+          System.out.println("Semantic Error: Type Mismatch in boolean expression statement in scope " + currentScope);
           typeError = typeError +1;
         }
         ast.endChildren();

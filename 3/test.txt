@@ -1,0 +1,70 @@
+/*These tests are the basic tests found on labouseur.com*/
+{
+ int a
+ boolean b
+ {
+  string c
+  a = 5
+  b = true /*comment*/
+  c = "inta"
+  print(c)
+  }
+ print(b)
+ print(a)
+}$
+
+{
+ int a
+ {
+  boolean b
+  a=1
+ }
+ print(b)
+}$
+
+/*Testing use of undeclared identifiers in a scope when declared in another scope*/
+{ {int a} print(a)}$
+
+/*Testing detection of redeclared identifiers*/
+{ int a string a print(a) }$
+
+/*a is redeclared in scope 1 (which is allowed) but after using the identifier a from scope 0.
+  There are technically no rules against this, but it does feel weird.
+  This also detects that the new a is uninitialized, and will display a warning. */
+
+{int a {a=1 print(a) string a} }$
+
+/*Type mismatch in assignment*/
+{int a a="hi" a=true a=false print(a)}$
+
+/*Type mismatch in print*/
+{int a a=1 print((a==true))}$
+
+/*I had difficulty displaying clear and concise error messages with complex boolean
+  Type mismatches, so it currently displays the scope the problem is found in.
+  Sorry for this :( it will be one of the first things I fix if I have time*/
+
+{int a string b boolean c while (c==(b==(a==c))) {} }$
+
+/*Testing warnings
+  a is declared, but unused.
+  b is declared and used, but not initialized
+  c is declared and initialized, but not used
+
+  The not used warnings are displayed at the end of the program because
+  it is checked when printing the symbol table*/
+{int a string b boolean c print(b) c=true}$
+
+/*Lots of identifiers!*/
+{int a string b boolean c int d int e intfintginth {string c boolean b}{int c boolean h}}$
+
+/*Not sure if this should give a warning or not...
+  a is technically being used and initialized but not in the same scope.
+  I decided to not give it a warning, but it feel the best*/
+{int a {a=1 print(a)} }$
+
+/*Making sure it is initialized in a scope it can access*/
+{string k {k="tricky"} {print(k)} }$
+
+
+
