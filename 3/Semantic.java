@@ -18,17 +18,23 @@ public class Semantic{
   public CSTNode construct(CSTNode node){
   
     if(node.tokType.equals("L_Bracket")){
+      // - Indication to start a new scope
       ast.addBranch("Block"); 
+        
+      // - -1 indicates it is the starting scope
       if(currentScope == -1){
         symTable.add(new Scope());
       }
       else{
         symTable.add(new Scope(currentScope));
       }
+        
+      // - update pointer to current scope
       currentScope = symTable.size()-1;
     }
       
     else if(node.tokType.equals("R_Bracket")){
+      // - end of scope, return scope pointer to parent
       ast.endChildren();
       if(symTable.get(currentScope).parent != -99){
         currentScope = symTable.get(currentScope).parent;
@@ -46,10 +52,12 @@ public class Semantic{
     }
       
     else if(node.tokType.equals("varDecl")){
+      // - VarDecl will always be Id and Type, so creating an expr is not needed here
       ast.addBranch("Var Decl");
       ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
       ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum);
      
+      // - since we are using an identifier, make sure it is not already declared
       err = symTable.get(currentScope).inTable(node.children.get(1).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);
         
       if(err == true){
@@ -63,11 +71,13 @@ public class Semantic{
     else if(node.tokType.equals("assignment statement")){
       String type = "";
       ast.addBranch("Assignment");
+      // - left side of an assignment is always an identifier
       ast.addLeaf(node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
         
       //EXPR CHILD
       type = makeExpr(node.children.get(2), 0);
         
+      // - Check for type mismatches
       err = symTable.get(currentScope).typeCheck(node.children.get(0).children.get(0).name, type, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope, symTable, currentScope);
         
       if(err == true){
@@ -81,16 +91,18 @@ public class Semantic{
     else if(node.tokType.equals("while statement")){
       ast.addBranch("While");
       
+      // - If there is only one child, no need to check complex boolean expressions.
+      // - It has to be only true or false.
       if(node.children.get(1).children.size() == 1){
         ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum);
           
-        //ast.endChildren();
       }
         
       else{
         String type1 = "";
         String type2 = "";
         
+        // - Complex boolean expressions, first determine equal or not equal
         if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
           ast.addBranch("Equal");
         }
@@ -104,22 +116,18 @@ public class Semantic{
           System.out.println("Semantic Error: Type Mismatch in while statement in scope " + currentScope);
           typeError = typeError + 1;
         }
-        //ast.endChildren();
+        
       }
         
-      //BLOCK CHILD
-      //construct(node.children.get(2).children.get(0));
-        
-      //ast.endChildren();
     }
       
     else if(node.tokType.equals("if statement")){
       ast.addBranch("If");
-      
+      // - Exactly the same as While
       if(node.children.get(1).children.size() == 1){
         ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum);
           
-        //ast.endChildren();
+        
       }
         
       else{
@@ -139,16 +147,13 @@ public class Semantic{
           System.out.println("Semantic Error: Type Mismatch in if statement in scope " + currentScope);
           typeError = typeError +1;
         }
-        //ast.endChildren();
+        
       }
         
-      //BLOCK CHILD
-      //construct(node.children.get(2).children.get(0));
-        
-      //ast.endChildren();
       
     }
       
+    // - Keep constructing the AST for the children of a L_Bracket in the CST
     if(node.children.size() != 0 && !stop){
       for (int j = 0; j < node.children.size(); j++){
         construct(node.children.get(j));
@@ -159,21 +164,22 @@ public class Semantic{
   }
     
   public String makeExpr(CSTNode expr, int temp){
+    // - if the expression is an identifier
     if(expr.children.get(0).tokType.equals("Id")){
       ast.addLeaf(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum) ;
     
+      // - make sure the identifier exists before using it
       exist = symTable.get(currentScope).existCheck(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum, currentScope, symTable, currentScope);
       if(temp == 0){
         ast.endChildren();
       }
       
-      //System.out.println(exist);
+      
       if(exist){
         return symTable.get(currentScope).getType(expr.children.get(0).children.get(0).name, symTable);
       }
       else{
         exist = false;
-        //System.out.println("test");
         typeError = typeError +1;
         return "Id";
       }
@@ -181,18 +187,22 @@ public class Semantic{
     }
       
     else if(expr.children.get(0).tokType.equals("Int Expr")){
+      // - if the children size is 1, there is only a single digit
       if(expr.children.get(0).children.size() == 1){
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
           
         ast.endChildren();
       }
+      // - if the children size is more than 1, there is addition of two (or more) digits
       else{
         String xtype = "";
         ast.addBranch("Add");
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
         
+        // - recursively call the makeExpr method to continuously add digits
         xtype = makeExpr(expr.children.get(0).children.get(2), 0);
           
+        // - if identifiers are used, make sure they are ints
         if(!(xtype.equals("Int"))){
           System.out.println("Semantic Error: Expected Int when adding on line " +expr.children.get(0).children.get(0).children.get(0).lineNum +", got " +xtype);
           typeError = typeError + 1;
@@ -205,6 +215,7 @@ public class Semantic{
     }
       
     else if(expr.children.get(0).tokType.equals("Boolean Expr")){
+      // - same as while statement / if statement in construct method above, except recursively
       if(expr.children.get(0).children.size() == 1){
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
           
@@ -249,6 +260,7 @@ public class Semantic{
   }
     
   public void printAST(CSTNode node, int depth){
+    // - almost identical to print CST
     String traversalResult = "";
     
     for(int i = 0; i < depth; i++){
@@ -284,6 +296,7 @@ public class Semantic{
   }
     
   public void printSym(){
+    // - Print out the contents of each scope's symbol table
     for(int i = 0; i < symTable.size(); i++){
       for(int j = 0; j < 26; j++){
         if(symTable.get(i).table[j] != null){
@@ -302,6 +315,7 @@ public class Semantic{
   }
     
   public void warnCheck(){
+    // - make sure each identifier was used at some point in the program
     for(int i = 0; i < symTable.size(); i++){
       for(int j = 0; j < 26; j++){
         if(symTable.get(i).table[j] != null){
@@ -321,6 +335,7 @@ public class Semantic{
 }
 
 class sNode {
+  // - used to store if an identifier has been used or initialized
   String sName = "";
   String sType = "";
   int sLine = 0;
@@ -342,7 +357,12 @@ class sNode {
 }
 
 class Scope{
+  // - contains the symbol table of each scope
+  // - also does type checking, declaration checking, etc.
   int parent = -99;
+    
+  // - a array of 26 is used because identifiers are only single ids
+  // - same concept as lexer to determine column in the transition table
   sNode[] table = new sNode [26];
     
   public Scope(){
@@ -401,7 +421,8 @@ class Scope{
         currentCol = j;
       }
     }
-      
+    
+    // - check to see if it declared in a parent scope
     if(table[currentCol] == null && parent != -99){
       err = tbl.get(parent).typeCheck(id, type, line, index, parent, tbl, fScope);
     }
@@ -415,6 +436,7 @@ class Scope{
         err = true;
       }
       else{
+        // - add where the identifier is currently being initialized
         table[currentCol].init = true;
         table[currentCol].initscope.add(fScope);
         err = false;
@@ -449,6 +471,7 @@ class Scope{
     }
     else if(table[currentCol] != null){
       table[currentCol].use = true;
+      // - check if the identifier is initialized when attempting to use it
       initialized = this.initCheck(id, line, index, fScope, tbl);
       
       ifexist = true;
@@ -502,9 +525,7 @@ class Scope{
       
     for(int i = 0; i < table[currentCol].initscope.size(); i++){
       if(table[currentCol].initscope.get(i) == scope){
-        /*System.out.println(table[currentCol].initscope.get(i));
-        System.out.println(scope);
-        System.out.println();*/
+        
         ifexist = true;
       }
     }
