@@ -18,8 +18,7 @@ public class Semantic{
   public CSTNode construct(CSTNode node){
   
     if(node.tokType.equals("L_Bracket")){
-      // - Indication to start a new scope
-      ast.addBranch("Block"); 
+      // - Indication to start a new scope 
         
       /*System.out.println(currentScope);
       System.out.println("block");
@@ -34,6 +33,7 @@ public class Semantic{
         
       // - update pointer to current scope
       currentScope = symTable.size()-1;
+      ast.addBranch("Block", currentScope); 
     }
       
     else if(node.tokType.equals("R_Bracket")){
@@ -45,7 +45,7 @@ public class Semantic{
     }
       
     else if(node.tokType.equals("print statement")){
-      ast.addBranch("Print");
+      ast.addBranch("Print", currentScope);
         
       CSTNode expr = null;
       expr = node.children.get(2);
@@ -56,8 +56,8 @@ public class Semantic{
       
     else if(node.tokType.equals("varDecl")){
       // - VarDecl will always be Id and Type, so creating an expr is not needed here
-      ast.addBranch("Var Decl");
-      ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum);
+      ast.addBranch("Var Decl", currentScope);
+      ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope);
       ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);
      
       // - since we are using an identifier, make sure it is not already declared
@@ -73,7 +73,7 @@ public class Semantic{
       
     else if(node.tokType.equals("assignment statement")){
       String type = "";
-      ast.addBranch("Assignment");
+      ast.addBranch("Assignment", currentScope);
       // - left side of an assignment is always an identifier
       ast.addLeaf(node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope);
         
@@ -92,12 +92,12 @@ public class Semantic{
     }
       
     else if(node.tokType.equals("while statement")){
-      ast.addBranch("While");
+      ast.addBranch("While", currentScope);
       
       // - If there is only one child, no need to check complex boolean expressions.
       // - It has to be only true or false.
       if(node.children.get(1).children.size() == 1){
-        ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum);
+        ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum, currentScope);
           
       }
         
@@ -107,10 +107,10 @@ public class Semantic{
         
         // - Complex boolean expressions, first determine equal or not equal
         if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
-          ast.addBranch("Equal");
+          ast.addBranch("Equal", currentScope);
         }
         else{
-          ast.addBranch("Not Equal");
+          ast.addBranch("Not Equal", currentScope);
         }
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
@@ -128,7 +128,7 @@ public class Semantic{
       ast.addBranch("If");
       // - Exactly the same as While
       if(node.children.get(1).children.size() == 1){
-        ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum);
+        ast.addLeaf(node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).children.get(0).lineNum, node.children.get(1).children.get(0).children.get(0).indexNum, currentScope);
           
         
       }
@@ -138,10 +138,10 @@ public class Semantic{
         String type2 = "";
           
         if(node.children.get(1).children.get(2).children.get(0).tokType.equals("equal")){
-          ast.addBranch("Equal");
+          ast.addBranch("Equal", currentScope);
         }
         else{
-          ast.addBranch("Not Equal");
+          ast.addBranch("Not Equal", currentScope);
         }
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
@@ -194,15 +194,15 @@ public class Semantic{
     else if(expr.children.get(0).tokType.equals("Int Expr")){
       // - if the children size is 1, there is only a single digit
       if(expr.children.get(0).children.size() == 1){
-        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
+        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
           
         ast.endChildren();
       }
       // - if the children size is more than 1, there is addition of two (or more) digits
       else{
         String xtype = "";
-        ast.addBranch("Add");
-        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
+        ast.addBranch("Add", currentScope);
+        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
         
         // - recursively call the makeExpr method to continuously add digits
         xtype = makeExpr(expr.children.get(0).children.get(2), 0);
@@ -222,7 +222,7 @@ public class Semantic{
     else if(expr.children.get(0).tokType.equals("Boolean Expr")){
       // - same as while statement / if statement in construct method above, except recursively
       if(expr.children.get(0).children.size() == 1){
-        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum);
+        ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
           
         ast.endChildren();
       }
@@ -230,10 +230,10 @@ public class Semantic{
         String xtype1 = "";
         String xtype2 = "";
         if(expr.children.get(0).children.get(2).children.get(0).tokType.equals("equal")){
-          ast.addBranch("Equal");
+          ast.addBranch("Equal", currentScope);
         }
         else{
-          ast.addBranch("Not Equal");
+          ast.addBranch("Not Equal", currentScope);
         }
           
         xtype1 = makeExpr(expr.children.get(0).children.get(1),1);
@@ -257,7 +257,7 @@ public class Semantic{
         start = start.children.get(1);
       }
         
-      ast.addLeaf(word, "String", expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum+1) ;
+      ast.addLeaf(word, "String", expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum+1, currentScope) ;
         
       return "String";
     }

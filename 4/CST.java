@@ -34,6 +34,13 @@ class CSTNode{
     lineNum = line;
     indexNum = index;
   }
+    
+  public CSTNode(String type, int line, int index, int scopee){
+    tokType = type;
+    lineNum = line;
+    indexNum = index;
+    scope = scopee;
+  }
 
 }
 
@@ -47,6 +54,18 @@ class CST{
   //Adding a Branch
   public void addBranch(String token){
     CSTNode node = new CSTNode(token, 0, 0);
+    if(this.root == null){
+      this.root = node;
+    }
+    else{
+      node.parent = this.current;
+      this.current.children.add(node);
+    }
+    this.current = node;
+  }
+    
+  public void addBranch(String token, int scope){
+    CSTNode node = new CSTNode(token, 0, 0, scope);
     if(this.root == null){
       this.root = node;
     }

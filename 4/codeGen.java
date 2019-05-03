@@ -20,6 +20,9 @@ public class codeGen{
   };
     
   public void generate (CSTNode node){
+      
+    currentScope = node.scope;
+      
     if(node.tokType.equals("Var Decl")){
       opCode[curPos] = "A9";
       curPos = curPos + 1;
@@ -61,6 +64,7 @@ public class codeGen{
       
     else if (node.tokType.equals("Block")){
       currentScope = scopeTotal + 1;
+      /*
       if(blockpos != -99){
         blocklist bbb = new blocklist(node.children.size(), -99, currentScope);
         blockTable.add(bbb);
@@ -71,6 +75,7 @@ public class codeGen{
         blockTable.add(bbb);
         blockpos = blockTable.size()-1;
       }
+      */
     }
     
     else if(node.tokType.equals("Assignment")){
@@ -137,6 +142,7 @@ public class codeGen{
       }
     }
       
+    /*
     if(node.parent.tokType.equals("Block")){
       blockTable.get(blockpos).curNum = blockTable.get(blockpos).curNum +1;
       if(blockTable.get(blockpos).curNum == blockTable.get(blockpos).childNum){
@@ -146,6 +152,7 @@ public class codeGen{
         }
       }
     }
+    */
   }
     
   
