@@ -6,6 +6,7 @@ class CSTNode{
   
   int lineNum = 0;
   int indexNum = 0;
+  int scope = 0;
   ArrayList<CSTNode> children = new ArrayList<CSTNode>();
   CSTNode parent = null;
   
@@ -17,6 +18,14 @@ class CSTNode{
     tokType = tType;
     lineNum = line;
     indexNum = index;
+  }
+    
+  public CSTNode(String tName, String tType, int line, int index, int scopee){
+    name = tName;
+    tokType = tType;
+    lineNum = line;
+    indexNum = index;
+    scope = scopee;
   }
     
   //Everything Else
@@ -51,6 +60,17 @@ class CST{
   //Adding a leaf (no children)
   public void addLeaf(String name, String type, int line, int index){
     CSTNode node = new CSTNode(name, type, line, index);
+    if(this.root == null){
+      this.root = node;
+    }
+    else{
+      node.parent = this.current;
+      this.current.children.add(node);
+    }  
+  }
+    
+  public void addLeaf(String name, String type, int line, int index, int scope){
+    CSTNode node = new CSTNode(name, type, line, index, scope);
     if(this.root == null){
       this.root = node;
     }
