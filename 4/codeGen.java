@@ -131,6 +131,40 @@ public class codeGen{
       }
     }
       
+    else if(node.tokType.equals("Print")){
+      opCode[curPos] = "A2";
+      curPos = curPos+1;
+      
+      if(!node.children.get(0).tokType.equals("String")){
+        opCode[curPos] = "01";
+        curPos = curPos+1;
+      }
+      else{
+        opCode[curPos] = "02";
+        curPos = curPos+1;
+      }
+        
+      opCode[curPos] = "AC";
+      curPos = curPos+1;
+      
+      String temp1 = "";
+      String temp2 = "";
+      for(int i = 0; i < staticTable.size()-1; i++){
+        if(staticTable.get(i).id.equals(node.children.get(1).name) && staticTable.get(i).scope == currentScope){
+          temp1 = staticTable.get(i).temp;
+          temp2 = staticTable.get(i).temp2;
+        }
+      }
+          
+      opCode[curPos] = temp1;
+      curPos = curPos+1;
+      opCode[curPos] = temp2;
+      curPos = curPos +1;
+        
+      opCode[curPos] = "FF";
+      curPos = curPos + 1;
+    }
+      
       
       
       
@@ -155,6 +189,24 @@ public class codeGen{
     */
   }
     
+  public void backPatch(){
+    for(int i = 0; i < staticTable.size(); i++){
+      staticTable.get(i).realP = Integer.toHexString(curPos);
+      curPos = curPos+1;
+    }
+      
+    for(int i = 0; i < staticTable.size(); i++){
+      for(int j = 0; j < opCode.length; j++){
+        if(staticTable.get(i).temp.equals(opCode[j])){
+          if(staticTable.get(i).temp2.equals(opCode[j+1])){
+            opCode[j] = staticTable.get(i).realP;
+            opCode[j+1] = "00";
+          }
+        }
+      }
+    }
+  }
+    
   
   
 }
@@ -162,6 +214,7 @@ public class codeGen{
 class sVar{
   String temp = "";
   String temp2 = "";
+  String realP = "";
   int scope = 0;
   String id = "";
   int offset = 0;
