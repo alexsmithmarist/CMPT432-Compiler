@@ -662,8 +662,11 @@ public class Compiler_prj1 {
             }
               
             //CODE GEN IMPLEMENTATAION
-            if(p3.typeError > 0){
-              
+            if(p3.typeError == 0){
+              codeGen p4 = new codeGen();
+              p4.generate(astRoot);
+              p4.backPatch();
+              p4.printOp();
             }
           }
         }

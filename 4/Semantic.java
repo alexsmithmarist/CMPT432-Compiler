@@ -57,8 +57,9 @@ public class Semantic{
     else if(node.tokType.equals("varDecl")){
       // - VarDecl will always be Id and Type, so creating an expr is not needed here
       ast.addBranch("Var Decl", currentScope);
+      
       ast.addLeaf(node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).tokType, node.children.get(0).children.get(0).lineNum, node.children.get(0).children.get(0).indexNum, currentScope);
-      ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);
+      ast.addLeaf(node.children.get(1).children.get(0).name, node.children.get(1).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope, node.children.get(0).children.get(0).tokType);
      
       // - since we are using an identifier, make sure it is not already declared
       err = symTable.get(currentScope).inTable(node.children.get(1).children.get(0).name, node.children.get(0).children.get(0).tokType, node.children.get(1).children.get(0).lineNum, node.children.get(1).children.get(0).indexNum, currentScope);

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 class CSTNode{
   String name = null;
   String tokType = " ";
+  String tru = "";
   
   int lineNum = 0;
   int indexNum = 0;
@@ -26,6 +27,15 @@ class CSTNode{
     lineNum = line;
     indexNum = index;
     scope = scopee;
+  }
+    
+  public CSTNode(String tName, String tType, int line, int index, int scopee, String truType){
+    name = tName;
+    tokType = tType;
+    lineNum = line;
+    indexNum = index;
+    scope = scopee;
+    tru = truType;
   }
     
   //Everything Else
@@ -87,9 +97,20 @@ class CST{
       this.current.children.add(node);
     }  
   }
-    
+
   public void addLeaf(String name, String type, int line, int index, int scope){
     CSTNode node = new CSTNode(name, type, line, index, scope);
+    if(this.root == null){
+      this.root = node;
+    }
+    else{
+      node.parent = this.current;
+      this.current.children.add(node);
+    }  
+  }
+    
+  public void addLeaf(String name, String type, int line, int index, int scope, String truel){
+    CSTNode node = new CSTNode(name, type, line, index, scope, truel);
     if(this.root == null){
       this.root = node;
     }
