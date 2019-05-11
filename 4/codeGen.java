@@ -12,6 +12,7 @@ public class codeGen{
   int parent = -1;
   int scopeTotal = -1;
   int blockpos = -99;
+  boolean ignoreNext = false;
   int stringPos = 254;
   boolean stop = false;
     
@@ -260,15 +261,119 @@ public class codeGen{
       curPos = curPos + 1;
     }
       
+    else if(node.tokType.equals("If")){
+      if(node.children.get(0).tokType.equals("Equal")){
+          
+        if(node.children.get(0).children.get(0).tokType.equals("Id") && node.children.get(0).children.get(1).tokType.equals("Id")){
+          opCode[curPos] = "AE";
+          curPos = curPos + 1;
+            
+          if(node.children.get(0).children.get(0).tokType.equals("Id")){
+            String temp1 = "";
+            String temp2 = "";
+            boolean found = false;
+            boolean first = false;
+            sVar hold = null;
+            for(int i = 0; i < staticTable.size(); i++){
+          
+              if(staticTable.get(i).id.equals(node.children.get(0).children.get(0).name)){
+                if(!first){
+                  hold = staticTable.get(i);
+                  first = true;
+                }
+                if(staticTable.get(i).scope == currentScope){
+                  found = true;
+                  temp1 = staticTable.get(i).temp;
+                  temp2 = staticTable.get(i).temp2;
+                  hold = staticTable.get(i);
+                }
+              }
+            }
+        
+            if(!found){
+              if(first){
+                temp1 = hold.temp;
+                temp2 = hold.temp2;
+              }
+            }
+          
+            opCode[curPos] = temp1;
+            curPos = curPos+1;
+            opCode[curPos] = temp2;
+            curPos = curPos +1;
+          }
+            
+          opCode[curPos] = "EC";
+          curPos = curPos + 1;
+            
+          if(node.children.get(0).children.get(1).tokType.equals("Id")){
+            String temp1 = "";
+            String temp2 = "";
+            boolean found = false;
+            boolean first = false;
+            sVar hold = null;
+            for(int i = 0; i < staticTable.size(); i++){
+          
+              if(staticTable.get(i).id.equals(node.children.get(0).children.get(1).name)){
+                if(!first){
+                  hold = staticTable.get(i);
+                  first = true;
+                }
+                if(staticTable.get(i).scope == currentScope){
+                  found = true;
+                  temp1 = staticTable.get(i).temp;
+                  temp2 = staticTable.get(i).temp2;
+                  hold = staticTable.get(i);
+                }
+              }
+            }
+        
+            if(!found){
+              if(first){
+                temp1 = hold.temp;
+                temp2 = hold.temp2;
+              }
+            }
+          
+            opCode[curPos] = temp1;
+            curPos = curPos+1;
+            opCode[curPos] = temp2;
+            curPos = curPos +1;
+          }
+            
+          opCode[curPos] = "D0";
+          curPos = curPos+1;
+          
+          String tempName = "J" + jumpNum;
+          jVar tempSpot;
+          tempSpot = new jVar(tempName);
+          jumpTable.add(tempSpot);
+          jumpNum = jumpNum + 1;
+          
+          opCode[curPos] = tempName;
+          int lengthTrack = curPos;
+          curPos = curPos +1;
+          
+          this.generate(node.children.get(1));
+          ignoreNext = true;
+            
+          tempSpot.setLength(curPos - lengthTrack);
+        }
+          
+      }
+    }
+    
       
       
       
       
       
-    if(node.children.size() != 0 && !stop){
+      
+    if(node.children.size() != 0 && !ignoreNext){
       for (int j = 0; j < node.children.size(); j++){
         generate(node.children.get(j));
       }
+      ignoreNext = false;
     }
       
     /*
@@ -298,6 +403,18 @@ public class codeGen{
             opCode[j] = staticTable.get(i).realP;
             opCode[j+1] = "00";
           }
+        }
+      }
+    }
+      
+    for(int i = 0; i < jumpTable.size(); i++){
+      jumpTable.get(i).replace = this.toHex(jumpTable.get(i).length);
+    }
+      
+    for(int i = 0; i < jumpTable.size(); i++){
+      for(int j = 0; j < opCode.length; j++){
+        if(jumpTable.get(i).temp.equals(opCode[j])){
+          opCode[j] = jumpTable.get(i).replace;
         }
       }
     }
@@ -366,6 +483,7 @@ class sVar{
 class jVar{
   String temp = "";
   int length = 0;
+  String replace = "";
     
   public jVar(){};
 
