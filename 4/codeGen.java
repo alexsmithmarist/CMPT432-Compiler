@@ -12,6 +12,7 @@ public class codeGen{
   int parent = -1;
   int scopeTotal = -1;
   int blockpos = -99;
+  int stringPos = 254;
   boolean stop = false;
     
   public codeGen(){
@@ -36,7 +37,13 @@ public class codeGen{
         
       if(staticNum < 10){ 
         String tempName = "T" + staticNum;
-        sVar tempSpot = new sVar(tempName, "XX", node.children.get(1).name, node.children.get(1).scope, staticNum);
+        sVar tempSpot;
+        if(node.children.get(0).tokType.equals("String")){
+          tempSpot = new sVar(tempName, "XX", node.children.get(1).name, node.children.get(1).scope, staticNum, true);
+        }
+        else{
+          tempSpot = new sVar(tempName, "XX", node.children.get(1).name, node.children.get(1).scope, staticNum, false);
+        }
         staticTable.add(tempSpot);
         staticNum = staticNum + 1;
           
@@ -48,7 +55,13 @@ public class codeGen{
       }
       else{
         String tempName = Integer.toString(staticNum);
-        sVar tempSpot = new sVar("T0", tempName, node.children.get(1).name, node.children.get(1).scope, staticNum);
+        sVar tempSpot;
+        if(node.children.get(0).tokType.equals("String")){
+          tempSpot = new sVar("T0", tempName, node.children.get(1).name, node.children.get(1).scope, staticNum, true);
+        }
+        else{
+          tempSpot = new sVar("T0", tempName, node.children.get(1).name, node.children.get(1).scope, staticNum, false);
+        }
         staticTable.add(tempSpot);
         staticNum = staticNum + 1;
           
@@ -71,6 +84,7 @@ public class codeGen{
       opCode[curPos] = "A9";
       curPos = curPos +1;
         
+      //System.out.println(node.children.get(1).tokType);
       if(!node.children.get(0).tokType.equals("String")){
         
         if(node.children.get(1).tokType.equals("True") || node.children.get(1).tokType.equals("False") ){
@@ -92,6 +106,25 @@ public class codeGen{
           String numName = "0" + node.children.get(1).name;
           opCode[curPos] = numName;
           curPos = curPos + 1;
+        }
+        
+        else if(node.children.get(1).tokType.equals("String")){
+          String word = node.children.get(1).name;
+         
+          stringPos = stringPos - word.length();
+          int tempo = stringPos;
+          
+          for(int i = 0; i < word.length(); i++){
+            char temp = word.charAt(i);
+            opCode[stringPos] = this.toHex((int) temp);
+            stringPos = stringPos + 1;
+          }
+            
+          opCode[stringPos] = "00";
+          opCode[curPos] = this.toHex(tempo);
+          curPos = curPos+1;
+          stringPos = tempo;
+          
         }
       
           
@@ -120,7 +153,13 @@ public class codeGen{
             String tempName = "T" + staticNum;
             temp1 = tempName;
             temp2 = "XX";
-            sVar tempSpot = new sVar(tempName, "XX", node.children.get(0).name, currentScope, staticNum);
+            sVar tempSpot;
+            if(node.children.get(1).tokType.equals("String")){
+              tempSpot = new sVar(tempName, "XX", node.children.get(0).name, currentScope, staticNum, true);
+            }
+            else{
+              tempSpot = new sVar(tempName, "XX", node.children.get(0).name, currentScope, staticNum, false);
+            }
             staticTable.add(tempSpot);
             
             staticNum = staticNum + 1;
@@ -130,7 +169,13 @@ public class codeGen{
             String tempName = Integer.toString(staticNum);
             temp1 = "T0";
             temp2 = tempName;
-            sVar tempSpot = new sVar("T0", tempName, node.children.get(0).name, currentScope, staticNum);
+            sVar tempSpot;
+            if(node.children.get(1).tokType.equals("String")){
+              tempSpot = new sVar("T0", tempName, node.children.get(0).name, currentScope, staticNum, true);
+            }
+            else{
+              tempSpot = new sVar("T0", tempName, node.children.get(0).name, currentScope, staticNum, false);
+            }
             staticTable.add(tempSpot);
             
             staticNum = staticNum + 1;
@@ -181,6 +226,7 @@ public class codeGen{
               found = true;
               temp1 = staticTable.get(i).temp;
               temp2 = staticTable.get(i).temp2;
+              hold = staticTable.get(i);
             }
           }
         }
@@ -199,8 +245,8 @@ public class codeGen{
         
         opCode[curPos] = "A2";
         curPos = curPos+1;
-      
-        if(!node.children.get(0).tokType.equals("String")){
+        System.out.println(node.children.get(0).tru);
+        if(hold.string == false){
           opCode[curPos] = "01";
           curPos = curPos+1;
         }
@@ -269,7 +315,11 @@ public class codeGen{
       }
       line = line + opCode[i] + " ";
       nicePrint = nicePrint+1;
+      if(i == 254){
+        System.out.println(line);
+      }
     }
+      
   }
     
   public String toHex(int n){
@@ -296,18 +346,20 @@ class sVar{
   String temp = "";
   String temp2 = "";
   String realP = "";
+  boolean string = false;
   int scope = 0;
   String id = "";
   int offset = 0;
     
   public sVar(){};
 
-  public sVar(String name, String name2, String ident, int scopee, int offs){
+  public sVar(String name, String name2, String ident, int scopee, int offs, boolean stin){
     temp = name;
     temp2 = name2;
     scope = scopee;
     id = ident;
     offset = offs;
+    string = stin;
   }
 }
 
