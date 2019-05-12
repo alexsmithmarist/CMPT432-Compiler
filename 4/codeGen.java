@@ -276,6 +276,8 @@ public class codeGen{
         
       opCode[curPos] = "FF";
       curPos = curPos + 1;
+      opCode[curPos] = "00";
+      curPos = curPos+1;
     }
       
     else if(node.tokType.equals("If")){
@@ -694,6 +696,394 @@ public class codeGen{
           }
         }
           
+        else{
+            
+          String holdTemp = "";
+          String holdTemp2 = "";
+          opCode[curPos] = "A9";
+          curPos = curPos+1;
+            
+          if(node.children.get(0).children.get(0).tokType.equals("Digit")){
+            String numName = "0" + node.children.get(0).children.get(0).name;
+            opCode[curPos] = numName;
+            curPos = curPos + 1;
+          }
+          else if(node.children.get(0).children.get(0).tokType.equals("True")){
+            opCode[curPos] = "01";
+            curPos = curPos+1;
+          }
+          else if(node.children.get(0).children.get(0).tokType.equals("False")){
+            opCode[curPos] = "00";
+            curPos = curPos+1;
+          }
+          else if(node.children.get(0).children.get(0).tokType.equals("Add")){
+            //????
+          }
+          else if(node.children.get(0).children.get(0).tokType.equals("String")){
+            String word = node.children.get(0).children.get(0).name;
+            boolean skip = false;
+            
+            for(int i =0; i < wordList.size(); i++){
+              if(wordList.get(i).word.equals(word)){
+                opCode[curPos] = wordList.get(i).place;
+                curPos = curPos+1;
+                skip = true;
+              }
+            }
+         
+            if(!skip){
+              stringPos = stringPos - word.length();
+              int tempo = stringPos;
+          
+              for(int i = 0; i < word.length(); i++){
+                char temp = word.charAt(i);
+                opCode[stringPos] = this.toHex((int) temp);
+                stringPos = stringPos + 1;
+              }
+            
+              opCode[stringPos] = "00";
+              opCode[curPos] = this.toHex(tempo);
+            
+              stringPlace storage = new stringPlace(word);
+              storage.place = this.toHex(tempo);
+              wordList.add(storage);
+          
+              curPos = curPos+1;
+              stringPos = tempo;
+              
+            }
+            
+            skip = false;
+          }
+            
+          opCode[curPos] = "8D";
+          curPos = curPos+1;
+            
+          if(staticNum < 10){ 
+            String tempName = "T" + staticNum;
+            sVar tempSpot;
+            if(node.children.get(0).children.get(0).tokType.equals("String")){
+              tempSpot = new sVar(tempName, "XX", node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).scope, staticNum, true);
+            }
+            else{
+              tempSpot = new sVar(tempName, "XX", node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).scope, staticNum, false);
+            }
+            staticTable.add(tempSpot);
+            staticNum = staticNum + 1;
+          
+            opCode[curPos] = tempName;
+            holdTemp = tempName;
+            curPos = curPos +1;
+          
+            opCode[curPos] = "XX";
+            holdTemp2 = "XX";
+            curPos = curPos+1;
+          }
+          else{
+            String tempName = Integer.toString(staticNum);
+            sVar tempSpot;
+            if(node.children.get(0).children.get(0).tokType.equals("String")){
+             tempSpot = new sVar("T0", tempName, node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).scope, staticNum, true);
+            }
+            else{
+              tempSpot = new sVar("T0", tempName, node.children.get(0).children.get(0).name, node.children.get(0).children.get(0).scope, staticNum, false);
+            }
+            staticTable.add(tempSpot);
+            staticNum = staticNum + 1;
+          
+            opCode[curPos] = "T0";
+            holdTemp = "T0";
+            curPos = curPos +1;
+          
+            opCode[curPos] = tempName;
+            holdTemp2 = tempName;
+            curPos = curPos+1;
+          }
+        
+          staticNum = staticNum+1;
+            
+          if(!node.children.get(0).children.get(1).tokType.equals("String")){
+              if(node.children.get(0).children.get(1).tokType.equals("Digit")){
+                opCode[curPos] = "A2";
+                curPos = curPos+1;
+                
+                String numName = "0" + node.children.get(0).children.get(1).name;
+                opCode[curPos] = numName;
+                curPos = curPos + 1;
+              }
+              
+              else if(node.children.get(0).children.get(1).tokType.equals("True")){
+                opCode[curPos] = "A2";
+                curPos = curPos+1;
+                
+                opCode[curPos] = "01";
+                curPos=curPos+1;
+              }
+              
+              else if(node.children.get(0).children.get(1).tokType.equals("False")){
+                opCode[curPos] = "A2";
+                curPos = curPos+1;
+                
+                opCode[curPos] = "00";
+                curPos=curPos+1;
+              }
+                
+              opCode[curPos] = "EC";
+              curPos = curPos+1;
+              
+          
+              opCode[curPos] = holdTemp;
+              curPos = curPos+1;
+              opCode[curPos] = holdTemp2;
+              curPos = curPos +1;
+                
+              opCode[curPos] = "D0";
+              curPos = curPos+1;
+          
+              String tempName = "J" + jumpNum;
+             jVar tempSpot;
+             tempSpot = new jVar(tempName);
+             jumpTable.add(tempSpot);
+             jumpNum = jumpNum + 1;
+          
+             opCode[curPos] = tempName;
+             int lengthTrack = curPos;
+             curPos = curPos +1;
+          
+             this.generate(node.children.get(1));
+             ignoreNext = true;
+            
+             tempSpot.setLength(curPos - lengthTrack);
+            }
+            else{
+              opCode[curPos] = "A2";
+              curPos=curPos+1;
+                
+              boolean sfound = false;
+                
+              for(int i =0; i < wordList.size(); i++){
+                if(wordList.get(i).word.equals(node.children.get(0).children.get(1).name)){
+                  opCode[curPos] = wordList.get(i).place;
+                  curPos = curPos+1;
+                  sfound = true;
+                }
+              }
+                
+              if(!sfound){
+                opCode[curPos] = "FF";
+                curPos = curPos+1;
+              }
+                
+              opCode[curPos] = "EC";
+              curPos = curPos+1;
+          
+              opCode[curPos] = holdTemp;
+              curPos = curPos+1;
+              opCode[curPos] = holdTemp2;
+              curPos = curPos +1;
+                
+              opCode[curPos] = "D0";
+              curPos = curPos+1;
+          
+              String tempName = "J" + jumpNum;
+             jVar tempSpot;
+             tempSpot = new jVar(tempName);
+             jumpTable.add(tempSpot);
+             jumpNum = jumpNum + 1;
+          
+             opCode[curPos] = tempName;
+             int lengthTrack = curPos;
+             curPos = curPos +1;
+          
+             this.generate(node.children.get(0).children.get(2));
+             ignoreNext = true;
+            
+             tempSpot.setLength(curPos - lengthTrack);
+                
+            }
+        }
+          
+          
+      }
+        
+      else if(node.children.get(0).tokType.equals("True")){
+        String holdTemp = "";
+        String holdTemp2 = "";
+        
+        opCode[curPos] = "A9";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "01";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "8D";
+        curPos = curPos+1;
+          
+        if(staticNum < 10){ 
+          String tempName = "T" + staticNum;
+          sVar tempSpot;
+          if(node.children.get(0).tokType.equals("String")){
+            tempSpot = new sVar(tempName, "XX", node.children.get(0).name, node.children.get(0).scope, staticNum, true);
+          }
+          else{
+            tempSpot = new sVar(tempName, "XX", node.children.get(0).name, node.children.get(0).scope, staticNum, false);
+          }
+          staticTable.add(tempSpot);
+          staticNum = staticNum + 1;
+          
+          opCode[curPos] = tempName;
+          holdTemp = tempName;
+          curPos = curPos +1;
+          
+          opCode[curPos] = "XX";
+          holdTemp2 = "XX";
+          curPos = curPos+1;
+        }
+        else{
+          String tempName = Integer.toString(staticNum);
+          sVar tempSpot;
+          if(node.children.get(0).tokType.equals("String")){
+            tempSpot = new sVar("T0", tempName, node.children.get(0).name, node.children.get(0).scope, staticNum, true);
+          }
+          else{
+            tempSpot = new sVar("T0", tempName, node.children.get(0).name, node.children.get(0).scope, staticNum, false);
+          }
+          staticTable.add(tempSpot);
+          staticNum = staticNum + 1;
+          
+          opCode[curPos] = "T0";
+          holdTemp = "T0";
+          curPos = curPos +1;
+          
+          opCode[curPos] = tempName;
+          holdTemp2 = tempName;
+          curPos = curPos+1;
+        }
+        
+        staticNum = staticNum+1;
+          
+        opCode[curPos] = "A2";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "01";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "EC";
+        curPos = curPos+1;
+          
+        opCode[curPos] = holdTemp;
+        curPos = curPos+1;
+        opCode[curPos] = holdTemp2;
+        curPos = curPos+1;
+          
+        opCode[curPos] = "D0";
+        curPos = curPos+1;
+          
+        String tempName = "J" + jumpNum;
+        jVar tempSpot;
+        tempSpot = new jVar(tempName);
+        jumpTable.add(tempSpot);
+        jumpNum = jumpNum + 1;
+          
+        opCode[curPos] = tempName;
+        int lengthTrack = curPos;
+        curPos = curPos +1;
+          
+        this.generate(node.children.get(1));
+        ignoreNext = true;
+            
+        tempSpot.setLength(curPos - lengthTrack);
+                
+      }
+        
+      else if(node.children.get(0).tokType.equals("False")){
+        String holdTemp = "";
+        String holdTemp2 = "";
+        
+        opCode[curPos] = "A9";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "00";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "8D";
+        curPos = curPos+1;
+          
+        if(staticNum < 10){ 
+          String tempName = "T" + staticNum;
+          sVar tempSpot;
+          if(node.children.get(0).tokType.equals("String")){
+            tempSpot = new sVar(tempName, "XX", node.children.get(0).name, node.children.get(0).scope, staticNum, true);
+          }
+          else{
+            tempSpot = new sVar(tempName, "XX", node.children.get(0).name, node.children.get(0).scope, staticNum, false);
+          }
+          staticTable.add(tempSpot);
+          staticNum = staticNum + 1;
+          
+          opCode[curPos] = tempName;
+          holdTemp = tempName;
+          curPos = curPos +1;
+          
+          opCode[curPos] = "XX";
+          holdTemp2 = "XX";
+          curPos = curPos+1;
+        }
+        else{
+          String tempName = Integer.toString(staticNum);
+          sVar tempSpot;
+          if(node.children.get(0).tokType.equals("String")){
+            tempSpot = new sVar("T0", tempName, node.children.get(0).name, node.children.get(0).scope, staticNum, true);
+          }
+          else{
+            tempSpot = new sVar("T0", tempName, node.children.get(0).name, node.children.get(0).scope, staticNum, false);
+          }
+          staticTable.add(tempSpot);
+          staticNum = staticNum + 1;
+          
+          opCode[curPos] = "T0";
+          holdTemp = "T0";
+          curPos = curPos +1;
+          
+          opCode[curPos] = tempName;
+          holdTemp2 = tempName;
+          curPos = curPos+1;
+        }
+        
+        staticNum = staticNum+1;
+          
+        opCode[curPos] = "A2";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "01";
+        curPos = curPos+1;
+          
+        opCode[curPos] = "EC";
+        curPos = curPos+1;
+          
+        opCode[curPos] = holdTemp;
+        curPos = curPos+1;
+        opCode[curPos] = holdTemp2;
+        curPos = curPos+1;
+          
+        opCode[curPos] = "D0";
+        curPos = curPos+1;
+          
+        String tempName = "J" + jumpNum;
+        jVar tempSpot;
+        tempSpot = new jVar(tempName);
+        jumpTable.add(tempSpot);
+        jumpNum = jumpNum + 1;
+          
+        opCode[curPos] = tempName;
+        int lengthTrack = curPos;
+        curPos = curPos +1;
+          
+        this.generate(node.children.get(1));
+        ignoreNext = true;
+            
+        tempSpot.setLength(curPos - lengthTrack);
+                
       }
     }
     
@@ -724,6 +1114,7 @@ public class codeGen{
   }
     
   public void backPatch(){
+    opCode[curPos] = "EA";
     curPos = curPos+1;
     for(int i = 0; i < staticTable.size(); i++){
       staticTable.get(i).realP = this.toHex(curPos);

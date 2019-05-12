@@ -147,7 +147,7 @@ public class Semantic{
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
-        System.out.println("Type1: "+type1);
+        
         //System.out.println(type2);
         if(!(type1.equals(type2))){
           System.out.println("Semantic Error: Type Mismatch in if statement in scope " + currentScope);
@@ -197,7 +197,9 @@ public class Semantic{
       if(expr.children.get(0).children.size() == 1){
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
           
-        ast.endChildren();
+        if(temp == 0){
+          ast.endChildren();
+        }
       }
       // - if the children size is more than 1, there is addition of two (or more) digits
       else{
@@ -225,7 +227,9 @@ public class Semantic{
       if(expr.children.get(0).children.size() == 1){
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
           
-        ast.endChildren();
+        if(temp == 0){
+          ast.endChildren();
+        }
       }
       else{
         String xtype1 = "";
