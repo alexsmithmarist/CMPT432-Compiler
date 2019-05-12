@@ -102,7 +102,8 @@ public class codeGen{
         }
         
         else if(node.children.get(1).tokType.equals("Add")){
-          //????
+          this.addInt(node.children.get(1), true, "", "");
+          ignoreNext = true;
         }
         else if(node.children.get(1).tokType.equals("Digit")){
           String numName = "0" + node.children.get(1).name;
@@ -158,6 +159,7 @@ public class codeGen{
         String temp2 = "";
         for(int i = 0; i < staticTable.size(); i++){
             
+          if(staticTable.get(i).id != null){
           if(staticTable.get(i).id.equals(node.children.get(0).name)){
             tempScope = staticTable.get(i).scope;
             if(staticTable.get(i).scope == currentScope){
@@ -165,6 +167,7 @@ public class codeGen{
               temp1 = staticTable.get(i).temp;
               temp2 = staticTable.get(i).temp2;
             }
+          }
           }
         }
           
@@ -235,6 +238,7 @@ public class codeGen{
         sVar hold = null;
         for(int i = 0; i < staticTable.size(); i++){
           
+          if(staticTable.get(i).id != null){
           if(staticTable.get(i).id.equals(node.children.get(0).name)){
             if(!first){
               hold = staticTable.get(i);
@@ -246,6 +250,7 @@ public class codeGen{
               temp2 = staticTable.get(i).temp2;
               hold = staticTable.get(i);
             }
+          }
           }
         }
         
@@ -717,7 +722,8 @@ public class codeGen{
             curPos = curPos+1;
           }
           else if(node.children.get(0).children.get(0).tokType.equals("Add")){
-            //????
+            this.addInt(node.children.get(0).children.get(0), true, "", "");
+            ignoreNext = true;
           }
           else if(node.children.get(0).children.get(0).tokType.equals("String")){
             String word = node.children.get(0).children.get(0).name;
@@ -1178,6 +1184,167 @@ public class codeGen{
       theHex = "0" + theHex;
     }
     return theHex;
+  }
+    
+  public void addInt (CSTNode node, boolean first, String temp1, String temp2){
+      
+    String holdTemp = "";
+    String holdTemp2 = "";
+      
+    if(!node.children.get(1).tokType.equals("Id")){
+      if(first){
+        String numName = "0" + node.children.get(0).name;
+        opCode[curPos] = numName;
+        curPos = curPos + 1;
+      
+    
+        opCode[curPos] = "8D";
+        curPos = curPos + 1;
+        
+        if(staticNum < 10){ 
+          String tempName = "T" + staticNum;
+          sVar tempSpot;
+        
+          tempSpot = new sVar(tempName, "XX", node.children.get(1).name, node.children.get(1).scope, staticNum, false);
+          staticTable.add(tempSpot);
+          staticNum = staticNum + 1;
+          
+          opCode[curPos] = tempName;
+          holdTemp = tempName;
+          curPos = curPos +1;
+          
+          opCode[curPos] = "XX";
+          holdTemp2 = "XX";
+          curPos = curPos+1;
+        }
+        else{
+          String tempName = Integer.toString(staticNum);
+          sVar tempSpot;
+          tempSpot = new sVar("T0", tempName, node.children.get(1).name, node.children.get(1).scope, staticNum, false);
+        
+          staticTable.add(tempSpot);
+          staticNum = staticNum + 1;
+          
+          opCode[curPos] = "T0";
+          holdTemp = "T0";
+          curPos = curPos +1;
+          
+          opCode[curPos] = tempName;
+          holdTemp2 = tempName;
+          curPos = curPos+1;
+        }
+        
+      }
+      
+      if(node.children.get(1).tokType.equals("Add")){
+        opCode[curPos] = "A9";
+        curPos = curPos+1;
+        
+        String numName = "0" + node.children.get(1).children.get(0).name;
+        opCode[curPos] = numName;
+        curPos = curPos + 1;
+      
+        opCode[curPos] = "6D";
+        curPos = curPos+1;
+        
+        opCode[curPos] = holdTemp;
+        curPos = curPos+1;
+        opCode[curPos] = holdTemp2;
+        curPos = curPos+1;
+          
+        opCode[curPos] = "8D";
+        curPos = curPos+1;
+          
+        opCode[curPos] = holdTemp;
+        curPos = curPos+1;
+        opCode[curPos] = holdTemp2;
+        curPos = curPos+1;
+          
+        this.addInt(node.children.get(1), false, holdTemp, holdTemp2);
+      }
+      else{
+        opCode[curPos] = "A9";
+        curPos = curPos+1;
+        
+        String numName = "0" + node.children.get(1).name;
+        opCode[curPos] = numName;
+        curPos = curPos + 1;
+      
+        opCode[curPos] = "6D";
+        curPos = curPos+1;
+        
+        if(!first){
+          opCode[curPos] = temp1;
+          curPos = curPos+1;
+          opCode[curPos] = temp2;
+          curPos = curPos+1;
+        }
+        else{
+          opCode[curPos] = holdTemp;
+          curPos = curPos+1;
+          opCode[curPos] = holdTemp2;
+          curPos = curPos+1;
+        }
+      }
+    }
+      
+    else{
+      if(!first){
+        opCode[curPos] = "A9";
+        curPos = curPos +1;
+      }
+      String numName = "0" + node.children.get(0).name;
+      opCode[curPos] = numName;
+      curPos = curPos + 1;
+        
+      opCode[curPos] = "6D";
+      curPos = curPos+1;
+        
+      String temp12 = "";
+      String temp22 = "";
+      boolean found = false;
+      boolean first2 = false;
+      sVar hold = null;
+      for(int i = 0; i < staticTable.size(); i++){
+          
+        if(staticTable.get(i).id != null){
+        if(staticTable.get(i).id.equals(node.children.get(1).name)){
+          if(!first){
+            hold = staticTable.get(i);
+            first2 = true;
+          }
+          if(staticTable.get(i).scope == currentScope){
+            found = true;
+            temp12 = staticTable.get(i).temp;
+            temp22 = staticTable.get(i).temp2;
+            hold = staticTable.get(i);
+          }
+        }
+        }
+      }
+        
+      if(!found){
+        if(first2){
+          temp12 = hold.temp;
+          temp22 = hold.temp2;
+        }
+      }
+         
+      if(!first){
+        opCode[curPos] = temp1;
+        curPos = curPos+1;
+        opCode[curPos] = temp2;
+        curPos = curPos +1;
+      }
+      else{
+        opCode[curPos] = temp12;
+        curPos = curPos+1;
+        opCode[curPos] = temp22;
+        curPos = curPos +1;
+      }
+        
+        
+    }
   }
     
   

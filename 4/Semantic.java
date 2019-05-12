@@ -216,7 +216,9 @@ public class Semantic{
           typeError = typeError + 1;
         }
         //ast.endChildren();
-        
+        if(temp == 0){
+          ast.endChildren();
+        }
       }
         
       return "Int";
