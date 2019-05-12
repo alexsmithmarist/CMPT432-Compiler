@@ -50,7 +50,7 @@ public class Semantic{
       CSTNode expr = null;
       expr = node.children.get(2);
         
-      makeExpr(expr, 0);
+      makeExpr(expr, 1);
       ast.endChildren();
     }
       
@@ -208,7 +208,7 @@ public class Semantic{
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
         
         // - recursively call the makeExpr method to continuously add digits
-        xtype = makeExpr(expr.children.get(0).children.get(2), 0);
+        xtype = makeExpr(expr.children.get(0).children.get(2), 1);
           
         // - if identifiers are used, make sure they are ints
         if(!(xtype.equals("Int"))){
