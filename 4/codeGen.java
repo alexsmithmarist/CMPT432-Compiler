@@ -281,8 +281,6 @@ public class codeGen{
         
       opCode[curPos] = "FF";
       curPos = curPos + 1;
-      opCode[curPos] = "00";
-      curPos = curPos+1;
     }
       
     else if(node.tokType.equals("If")){
@@ -422,6 +420,7 @@ public class codeGen{
               sVar hold = null;
               for(int i = 0; i < staticTable.size(); i++){
           
+                if(staticTable.get(i).id != null){  
                 if(staticTable.get(i).id.equals(node.children.get(0).children.get(0).name)){
                   if(!first){
                     hold = staticTable.get(i);
@@ -433,6 +432,7 @@ public class codeGen{
                     temp2 = staticTable.get(i).temp2;
                     hold = staticTable.get(i);
                   }
+                }
                 }
               }
          
@@ -723,7 +723,7 @@ public class codeGen{
           }
           else if(node.children.get(0).children.get(0).tokType.equals("Add")){
             this.addInt(node.children.get(0).children.get(0), true, "", "");
-            ignoreNext = true;
+            //ignoreNext = true;
           }
           else if(node.children.get(0).children.get(0).tokType.equals("String")){
             String word = node.children.get(0).children.get(0).name;
@@ -1120,7 +1120,9 @@ public class codeGen{
   }
     
   public void backPatch(){
-    opCode[curPos] = "EA";
+    opCode[curPos] = "00";
+    curPos = curPos+1;
+    opCode[curPos] = "00";
     curPos = curPos+1;
     for(int i = 0; i < staticTable.size(); i++){
       staticTable.get(i).realP = this.toHex(curPos);
