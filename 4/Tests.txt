@@ -1,0 +1,88 @@
+/* I was unable to completely cover all aspects of this project before the due date,
+so I focused on the basics of most concepts of code generation.
+The following test cases show what I was able to accomplish before the due date. Hopefully
+it is enough for a not failing grade*/
+
+/*Simple VarDecl -> Assign -> Print test for all types*/
+
+{string a a="limelight" print(a) int b b=1 print(b) boolean c c=true print(c) boolean d d=false print(d)}$
+
+
+
+/*Printing in different scopes! 
+I tried this on 3 separate hall of fame compilers and they all were unable to do this.
+They all printed 3 twice, which is incorrect. */
+
+{int a a=1 {a=3 print(a)} print(a)}$
+
+
+
+/*Adding!
+For some reason, attempting to add
+more than 3 numbers/ids causes an error when
+creating the op codes.*/
+
+{int a a=1+1 print(a)
+ int b b=1+2+3 print(b)
+ int c c=1+b print(c)
+ int d d=1+3+c print(d)}$
+
+
+
+/*Re-assigning a string*/
+
+{string a a="time" print(a) a="still" {a="stand" print(a)} print(a)}$
+
+
+
+/*if statements! 
+Equal, Not Equal, True, and False
+are all working as valid boolean checks for if statements.
+I was unable to finish working on multiple boolean expressions,
+(for example a==(c==b) will not work) so only simple expressions
+such as (a==1) or (b!=true) will work currently.*/
+
+{string a a="freewill" int c c=1 if(c==1){print(a)}
+ string b b="red" if true{print(b)}}$
+
+
+
+/* Not Equal currently does not work when comparing two 
+identifiers (for example, (a!=b) does not work currently)*/
+
+{string r r="radio" int u u=4 if(u!=5){print(r)}}$
+
+
+
+/*Before continuing on, one thing to note is that nesting
+if statements work for some inputs but not most for the
+time being.*/
+
+/*While loops!
+Currently While loops support only Not Equal, True, and
+False (it didn't make sense to focus on Equal since it isn't
+much different from an If statement at that point) for
+boolean checks. Like, If statements, complex boolean 
+expressions are currently not supported. Nesting is also not
+supported currently.*/
+
+{int a a=1 while(a!=4){print(a) a=1+a}}$
+
+
+/*Slightly different output*/
+{int a a=1 while(a!=4){a=1+a print(a)}}$
+
+
+
+/*While loops are definitely buggy, but these basic while loops will work*/
+
+
+/*Printing constants*/
+{print(1) print(true) print(false) print("goodbye")}$
+
+
+/*These test cases are what will mostly generate correct op codes.
+I do plan on finishing this compiler and ironing out bugs eventually to put on my resume,
+but this is what I can accomplish before the due date.
+
+Thank you for teaching an cool class and have a great summer!*/

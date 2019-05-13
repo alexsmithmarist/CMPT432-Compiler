@@ -11,6 +11,7 @@ public class Semantic{
   boolean exist = false;
   boolean err = false;
   boolean fromB = false;
+  boolean fromIf = false;
   
 
     
@@ -150,7 +151,7 @@ public class Semantic{
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
-        
+        fromIf = true;
         //System.out.println(type2);
         if(!(type1.equals(type2))){
           System.out.println("Semantic Error: Type Mismatch in if statement in scope " + currentScope);
@@ -185,6 +186,11 @@ public class Semantic{
         }
         fromB = false;
       }
+      if(fromIf){
+        ast.endChildren();
+        ast.endChildren();
+        fromIf = false;
+      }
       
       
       if(exist){
@@ -214,6 +220,7 @@ public class Semantic{
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
         
         // - recursively call the makeExpr method to continuously add digits
+        
         xtype = makeExpr(expr.children.get(0).children.get(2), 0);
           
         // - if identifiers are used, make sure they are ints
@@ -271,6 +278,13 @@ public class Semantic{
       }
         
       ast.addLeaf(word, "String", expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum+1, currentScope) ;
+        
+      if(!fromB){
+        if(temp == 0){
+          ast.endChildren();
+        }
+        fromB = false;
+      }
         
       return "String";
     }
