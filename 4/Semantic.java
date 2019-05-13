@@ -10,6 +10,7 @@ public class Semantic{
   int currentScope = -1;
   boolean exist = false;
   boolean err = false;
+  boolean fromB = false;
   
 
     
@@ -116,6 +117,8 @@ public class Semantic{
           
         type1 = makeExpr(node.children.get(1).children.get(1), 1);
         type2 = makeExpr(node.children.get(1).children.get(3), 0);
+          
+        fromB = true;
         if(!(type1.equals(type2))){
           System.out.println("Semantic Error: Type Mismatch in while statement in scope " + currentScope);
           typeError = typeError + 1;
@@ -176,8 +179,11 @@ public class Semantic{
     
       // - make sure the identifier exists before using it
       exist = symTable.get(currentScope).existCheck(expr.children.get(0).children.get(0).name, expr.children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).indexNum, currentScope, symTable, currentScope);
-      if(temp == 0){
-        ast.endChildren();
+      if(!fromB){
+        if(temp == 0){
+          ast.endChildren();
+        }
+        fromB = false;
       }
       
       
@@ -208,7 +214,7 @@ public class Semantic{
         ast.addLeaf(expr.children.get(0).children.get(0).children.get(0).name, expr.children.get(0).children.get(0).children.get(0).tokType, expr.children.get(0).children.get(0).children.get(0).lineNum, expr.children.get(0).children.get(0).children.get(0).indexNum, currentScope);
         
         // - recursively call the makeExpr method to continuously add digits
-        xtype = makeExpr(expr.children.get(0).children.get(2), 1);
+        xtype = makeExpr(expr.children.get(0).children.get(2), 0);
           
         // - if identifiers are used, make sure they are ints
         if(!(xtype.equals("Int"))){

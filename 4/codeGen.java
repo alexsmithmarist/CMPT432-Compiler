@@ -1111,6 +1111,7 @@ public class codeGen{
       
     else if(node.tokType.equals("While")){
       if(node.children.get(0).tokType.equals("Not Equal")){
+        int jumpBack = curPos;
         String temp11 = "";
         String temp12 = "";
         String temp21 = "";
@@ -1400,7 +1401,7 @@ public class codeGen{
         opCode[curPos] = "D0";
         curPos = curPos+1;
         tempSpot.setLength(curPos - lengthTrack);
-        opCode[curPos] = this.toHex(255-lengthTrack-16);
+        opCode[curPos] = this.toHex(255-(curPos-jumpBack));
         curPos = curPos+1;
           
         
