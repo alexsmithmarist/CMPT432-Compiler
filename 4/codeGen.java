@@ -14,6 +14,7 @@ public class codeGen{
   int scopeTotal = -1;
   int blockpos = -99;
   boolean ignoreNext = false;
+  boolean override = false;
   int stringPos = 254;
   boolean stop = false;
     
@@ -420,6 +421,7 @@ public class codeGen{
               }
                 
               else if(node.children.get(0).children.get(1).tokType.equals("Add")){
+                override = true;
                 this.addInt(node.children.get(0).children.get(1), true, "", "");
               }
                 
@@ -474,6 +476,7 @@ public class codeGen{
              int lengthTrack = curPos;
              curPos = curPos +1;
           
+             override = true;
              this.generate(node.children.get(1));
              ignoreNext = true;
             
@@ -872,6 +875,7 @@ public class codeGen{
              int lengthTrack = curPos;
              curPos = curPos +1;
           
+             override = true;
              this.generate(node.children.get(1));
              ignoreNext = true;
             
@@ -917,6 +921,7 @@ public class codeGen{
              int lengthTrack = curPos;
              curPos = curPos +1;
           
+             override = true;
              this.generate(node.children.get(0).children.get(2));
              ignoreNext = true;
             
@@ -1101,6 +1106,7 @@ public class codeGen{
         int lengthTrack = curPos;
         curPos = curPos +1;
           
+        boolean override = true;
         this.generate(node.children.get(1));
         ignoreNext = true;
             
@@ -1368,6 +1374,7 @@ public class codeGen{
         int lengthTrack = curPos;
         curPos = curPos +1;
           
+        override = true;
         this.generate(node.children.get(1));
         ignoreNext = true;
             
@@ -1416,11 +1423,12 @@ public class codeGen{
       
       
       
-    if(node.children.size() != 0 && !ignoreNext){
+    if(node.children.size() != 0 && (!ignoreNext || override)){
       for (int j = 0; j < node.children.size(); j++){
         generate(node.children.get(j));
       }
       ignoreNext = false;
+      override = false;
     }
       
     /*
@@ -1512,6 +1520,10 @@ public class codeGen{
       
     if(!node.children.get(1).tokType.equals("Id")){
       if(first){
+        if(override){
+          opCode[curPos] = "A9";
+          curPos = curPos + 1;
+        }
         String numName = "0" + node.children.get(0).name;
         opCode[curPos] = numName;
         curPos = curPos + 1;
