@@ -8,7 +8,7 @@ I am programming all assignments on a 64 bit Windows 10 machine using the Eclips
 There will be frequent commits to this repository throughout the semester for each assignment.
 
 In order to run each project, all the files from the associated folder must be downloaded and stored within the same folder.
-For example, to properly run project 3, all the java files from folder 3 must be downloaded and stored in the same sub-folder. All inputs must also be stored in that folder
+For example, to properly run project 4, all the java files from folder 4 must be downloaded and stored in the same sub-folder. All inputs must also be stored in that folder
 The program can be executed with an input with:
 
 java Compiler_prj1 < input.txt
