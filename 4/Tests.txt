@@ -85,4 +85,4 @@ supported currently.*/
 I do plan on finishing this compiler and ironing out bugs eventually to put on my resume,
 but this is what I can accomplish before the due date.
 
-Thank you for teaching an cool class and have a great summer!*/
+Thank you for teaching a cool class and have a great summer!*/
